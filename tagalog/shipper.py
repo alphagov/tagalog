@@ -216,6 +216,12 @@ class RedisShipper(IShipper):
                 'db': db}
 
 
+class StdoutShipper(IShipper):
+
+    def ship(self, msg):
+        print(msg)
+
+
 class NullShipper(IShipper):
 
     def ship(self, msg):
@@ -237,4 +243,5 @@ def get_shipper(name):
     return SHIPPERS.get(name)
 
 register_shipper('redis', RedisShipper)
+register_shipper('stdout', StdoutShipper)
 register_shipper('null', NullShipper)
