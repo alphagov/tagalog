@@ -29,7 +29,8 @@ def stamp(iterable, key='@timestamp'):
 def fields(iterable, fields=None):
     """
     Add a set of fields to each item in ``iterable``. The set of fields have a
-    key=value format. '@' are added to the front of each key.
+    key=value format. '@' are added to the front of each key. New fields
+    will be merged on top of existing fields.
     """
     if not fields:
         for item in iterable:
@@ -42,7 +43,10 @@ def fields(iterable, fields=None):
 
 
 def _process_fields(item, fields):
-    item.update(fields)
+    if not '@fields' in item:
+        item['@fields'] = {}
+
+    item['@fields'].update(fields)
     return item
 
 def _prepare_fields(fields):
@@ -52,7 +56,7 @@ def _prepare_fields(fields):
         split_field = field.split('=', 1)
         if len(split_field) > 1:
           prepared_fields[split_field[0]] = split_field[1][:]
-    return { '@fields': prepared_fields }
+    return prepared_fields
 
 
 def tag(iterable, tags=None, key='@tags'):

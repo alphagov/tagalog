@@ -40,13 +40,13 @@ def test_multiple_fields_field():
 def test_existing_fields_are_overwritten():
     data = [{'@message': 'hello',
              '@fields': {
-               'existing': 'field'}
+               'existing': 'field', 'untouched': 'field'}
             }]
     out = fields(data, ['existing=wood'])
 
     assert_equal(next(out), {'@message': 'hello',
                              '@fields': {
-                               'existing': 'wood'}
+                               'existing': 'wood', 'untouched': 'field'}
                             })
 
 def test_field_without_equals_is_skipped():
