@@ -20,10 +20,12 @@ def stamp(iterable, key='@timestamp'):
     Compute an accurate timestamp for each dict or dict-like object in
     ``iterable``, adding an accurate timestamp to each one when received. The
     timestamp is a usecond-precision ISO8601 string. The timestamp is added to
-    each dict with a key set by ``key``.
+    each dict with a key set by ``key`` unless the dict already contains
+    it's own.
     """
     for item in iterable:
-        item[key] = now()
+        if not key in item:
+            item[key] = now()
         yield item
 
 def fields(iterable, fields=None):

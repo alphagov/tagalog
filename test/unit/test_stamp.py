@@ -42,3 +42,18 @@ def test_stamp_key(now_mock):
                  {'ts': '2013-01-01T09:00:03.000200Z',
                   'msg': 'three'})
 
+def test_stamp_existing_timestamp():
+    data = [{'ts': '2013-01-01T09:00:01.000000Z', 'msg': 'one'},
+            {'ts': '2013-01-01T09:00:02.000100Z', 'msg': 'two'},
+            {'ts': '2013-01-01T09:00:03.000200Z', 'msg': 'three'}]
+
+    out = stamp(data, key='ts')
+    assert_equal(next(out),
+                 {'ts': '2013-01-01T09:00:01.000000Z',
+                  'msg': 'one'})
+    assert_equal(next(out),
+                 {'ts': '2013-01-01T09:00:02.000100Z',
+                  'msg': 'two'})
+    assert_equal(next(out),
+                 {'ts': '2013-01-01T09:00:03.000200Z',
+                  'msg': 'three'})
