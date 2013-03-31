@@ -16,6 +16,8 @@ parser.add_argument('-f', '--fields', nargs='+',
                     help='Add key=value fields specified to each request')
 parser.add_argument('-s', '--shipper', default='redis',
                     help='Select the shipper to be used to ship logs')
+parser.add_argument('-j', '--json', action='store_true',
+                    help='Content is already JSON')
 parser.add_argument('--no-stamp', action='store_true')
 parser.add_argument('--bulk', action='store_true',
                     help='Send log data in elasticsearch bulk format')
@@ -32,7 +34,11 @@ def main():
     args = parser.parse_args()
     shpr = shipper.get_shipper(args.shipper)(args)
 
-    msgs = io.messages(sys.stdin)
+    if args.json:
+        msgs = io.json_messages(sys.stdin)
+    else:
+        msgs = io.messages(sys.stdin)
+
     if not args.no_stamp:
         msgs = stamp(msgs)
     if args.tags:
