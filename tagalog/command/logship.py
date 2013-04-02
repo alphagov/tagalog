@@ -5,6 +5,7 @@ import sys
 import textwrap
 
 from tagalog import io, stamp, tag, fields
+from tagalog import messages, json_messages
 from tagalog import shipper
 
 parser = argparse.ArgumentParser(description=textwrap.dedent("""
@@ -35,9 +36,9 @@ def main():
     shpr = shipper.get_shipper(args.shipper)(args)
 
     if args.json:
-        msgs = io.json_messages(sys.stdin)
+        msgs = json_messages(sys.stdin)
     else:
-        msgs = io.messages(sys.stdin)
+        msgs = messages(sys.stdin)
 
     if not args.no_stamp:
         msgs = stamp(msgs)

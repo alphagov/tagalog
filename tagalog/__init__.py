@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 import datetime
 import os
+import json
+import logging
 
 from tagalog import io
 
@@ -9,6 +11,40 @@ __version__ = '0.2.4'
 
 # Use UTF8 for stdin, stdout, stderr
 os.environ['PYTHONIOENCODING'] = 'utf-8'
+
+log = logging.getLogger(__name__)
+
+
+def messages(fp, key='@message'):
+    """
+    Read lines of UTF-8 from the file-like object given in ``fp``, with the
+    same fault-tolerance as :function:`tagalog.io.lines`, but instead yield
+    dicts with the line data stored in the key given by ``key`` (default:
+    "@message").
+    """
+    for line in io.lines(fp):
+        txt = line.rstrip('\n')
+        yield {key: txt}
+
+
+def json_messages(fp):
+    """
+    Similar to :function:`tagalog.io.messages` but input is already
+    structured as JSON. Each event must be on a single line. Unparseable
+    events will be skipped and raise a warning.
+    """
+    for line in io.lines(fp):
+        try:
+            item = json.loads(line)
+        except ValueError as e:
+            log.warn('Could not parse JSON message: {0}'.format(e))
+            continue
+
+        if not isinstance(item, dict) or not len(item) >= 1:
+            log.warn('Skipping message not a dictionary of >=1 length')
+            continue
+
+        yield item
 
 
 def now():
