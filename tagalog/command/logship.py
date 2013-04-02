@@ -35,10 +35,12 @@ def main():
     args = parser.parse_args()
     shpr = shipper.get_shipper(args.shipper)(args)
 
+    lines = io.lines(sys.stdin)
+
     if args.json:
-        msgs = json_messages(sys.stdin)
+        msgs = json_messages(lines)
     else:
-        msgs = messages(sys.stdin)
+        msgs = messages(lines)
 
     if not args.no_stamp:
         msgs = stamp(msgs)

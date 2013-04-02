@@ -15,25 +15,23 @@ os.environ['PYTHONIOENCODING'] = 'utf-8'
 log = logging.getLogger(__name__)
 
 
-def messages(fp, key='@message'):
+def messages(iterable, key='@message'):
     """
-    Read lines of UTF-8 from the file-like object given in ``fp``, with the
-    same fault-tolerance as :function:`tagalog.io.lines`, but instead yield
-    dicts with the line data stored in the key given by ``key`` (default:
-    "@message").
+    Read lines of UTF-8 from the iterable ``iterable`` and yield dicts with the
+    line data stored in the key given by ``key`` (default: "@message").
     """
-    for line in io.lines(fp):
+    for line in iterable:
         txt = line.rstrip('\n')
         yield {key: txt}
 
 
-def json_messages(fp):
+def json_messages(iterable):
     """
-    Similar to :function:`tagalog.io.messages` but input is already
-    structured as JSON. Each event must be on a single line. Unparseable
-    events will be skipped and raise a warning.
+    Similar to :function:`tagalog.messages` but input is already structured as
+    JSON. Each event must be on a single line. Unparseable events will be
+    skipped and raise a warning.
     """
-    for line in io.lines(fp):
+    for line in iterable:
         try:
             item = json.loads(line)
         except ValueError as e:

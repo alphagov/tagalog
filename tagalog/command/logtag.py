@@ -4,8 +4,7 @@ import json
 import sys
 import textwrap
 
-from tagalog import io, stamp, tag, fields
-from tagalog import messages
+from tagalog import io, fields, messages, stamp, tag
 
 parser = argparse.ArgumentParser(description=textwrap.dedent("""
     Convert log data on STDIN to a stream of timestamped JSON documents on STDOUT,
@@ -18,7 +17,7 @@ parser.add_argument('--no-stamp', action='store_true')
 
 def main():
     args = parser.parse_args()
-    msgs = messages(sys.stdin)
+    msgs = messages(io.lines(sys.stdin))
     if not args.no_stamp:
         msgs = stamp(msgs)
     if args.tags:
