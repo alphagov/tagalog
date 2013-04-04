@@ -26,36 +26,54 @@ def test_json_timestamp_generated():
     # with the use of subprocess to spawn a separate interpreter.
     raise SkipTest
 
-    json_input = '{"@fields": {"handbags": "great", "why": "because"}}'
+    input_dict = {
+      '@fields': {'handbags': 'great', 'why': 'because'}
+    }
+
     p = Popen('logship --json -s stdout',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json_input)
-    assert_equal({'@timestamp': '2013-01-01T09:00:00.000000Z', '@fields': { 'handbags': 'great', 'why': 'because'}},
-                 json.loads(data_out.decode("utf-8")))
+    data_out, _ = p.communicate(input=json.dumps(input_dict))
+
+    input_dict['@timestamp'] = '2013-01-01T09:00:00.000000Z'
+    assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
 
 
 def test_json_timestamp_included():
-    json_input = '{"@timestamp": "2013-01-01T09:00:00.000000Z", "@fields": {"handbags": "great", "why": "because"}}'
+    input_dict = {
+      '@timestamp': '2013-01-01T09:00:00.000000Z',
+      '@fields': {'handbags': 'great', 'why': 'because'},
+    }
+
     p = Popen('logship --json -s stdout',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json_input)
-    assert_equal({'@timestamp': '2013-01-01T09:00:00.000000Z', '@fields': { 'handbags': 'great', 'why': 'because'}},
-                 json.loads(data_out.decode("utf-8")))
+    data_out, _ = p.communicate(input=json.dumps(input_dict))
+    assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
 
 
 def test_json_tags():
-    json_input = '{"@timestamp": "2013-01-01T09:00:00.000000Z", "@fields": {"handbags": "great", "why": "because"}, "@tags": ["handbags"]}'
+    input_dict = {
+      '@timestamp': '2013-01-01T09:00:00.000000Z',
+      '@fields': {'handbags': 'great', 'why': 'because'},
+      '@tags': ['handbags'],
+    }
+
     p = Popen('logship --json -s stdout -t why',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json_input)
-    assert_equal({'@timestamp': '2013-01-01T09:00:00.000000Z', '@fields': { 'handbags': 'great', 'why': 'because'}, '@tags': ['handbags', 'why']},
-                 json.loads(data_out.decode("utf-8")))
+    data_out, _ = p.communicate(input=json.dumps(input_dict))
+
+    input_dict['@tags'].append('why')
+    assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
 
 
 def test_json_fields():
-    json_input = '{"@timestamp": "2013-01-01T09:00:00.000000Z", "@fields": {"handbags": "great", "why": "because"}}'
+    input_dict = {
+      '@timestamp': '2013-01-01T09:00:00.000000Z',
+      '@fields': {'handbags': 'great', 'why': 'because'},
+    }
+
     p = Popen('logship --json -s stdout -f cannot=comprehend',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json_input)
-    assert_equal({'@timestamp': '2013-01-01T09:00:00.000000Z', '@fields': { 'handbags': 'great', 'why': 'because', 'cannot': 'comprehend'}},
-                 json.loads(data_out.decode("utf-8")))
+    data_out, _ = p.communicate(input=json.dumps(input_dict))
+
+    input_dict['@fields']['cannot'] = 'comprehend'
+    assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
