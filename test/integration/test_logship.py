@@ -7,7 +7,7 @@ import json
 def test_tags():
     p = Popen('logship --no-stamp -s stdout -t handbags great',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input='hello')
+    data_out, _ = p.communicate(input='hello'.encode("utf-8"))
     assert_equal({'@message': 'hello', '@tags': ['handbags', 'great']},
                  json.loads(data_out.decode("utf-8")))
 
@@ -15,7 +15,7 @@ def test_tags():
 def test_fields():
     p = Popen('logship --no-stamp -s stdout -f handbags=great why=because',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input='hello')
+    data_out, _ = p.communicate(input='hello'.encode("utf-8"))
     assert_equal({'@message': 'hello', '@fields': { 'handbags': 'great', 'why': 'because'}},
                  json.loads(data_out.decode("utf-8")))
 
@@ -32,7 +32,7 @@ def test_json_timestamp_generated():
 
     p = Popen('logship --json -s stdout',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json.dumps(input_dict))
+    data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
     input_dict['@timestamp'] = '2013-01-01T09:00:00.000000Z'
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
@@ -46,7 +46,7 @@ def test_json_timestamp_included():
 
     p = Popen('logship --json -s stdout',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json.dumps(input_dict))
+    data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
 
 
@@ -59,7 +59,7 @@ def test_json_tags():
 
     p = Popen('logship --json -s stdout -t why',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json.dumps(input_dict))
+    data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
     input_dict['@tags'].append('why')
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
@@ -73,7 +73,7 @@ def test_json_fields():
 
     p = Popen('logship --json -s stdout -f cannot=comprehend',
               shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json.dumps(input_dict))
+    data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
     input_dict['@fields']['cannot'] = 'comprehend'
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
