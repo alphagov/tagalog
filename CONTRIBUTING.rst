@@ -73,8 +73,8 @@ you as a project maintainer with permissions to release new versions. The
 process of releasing a new version goes as follows:
 
 1. Ensure that ``HEAD`` is pushed and that the latest Travis build has passed.
-2. Bump the version of Tagalog in `tagalog/__init__.py`. The version bump should
-   be its own commit with a message of the form "Bump version -> vX.Y.Z" 
+2. Bump the version of Tagalog in ``tagalog/__init__.py``. The version bump
+   should be its own commit with a message of the form "Bump version -> vX.Y.Z"
 3. Release a new source distribution::
 
        $ python setup.py sdist register upload
