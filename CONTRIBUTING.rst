@@ -27,6 +27,7 @@ and they will immediately reflect changes you make to the Tagalog code. If you
 add or update the list of commands in ``setup.py`` you will need to rerun
 
 ::
+
     $ pip install -e .
 
 .. _pip: http://www.pip-installer.org/
