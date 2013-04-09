@@ -35,7 +35,7 @@ def test_json_timestamp_generated():
     output_dict = json.loads(data_out.decode("utf-8"))
     output_ts = output_dict.pop('@timestamp')
     assert_equal(input_dict, output_dict)
-    tsrange.assert_inrange(output_ts)
+    tsrange.assert_in_range(output_ts)
 
 
 def test_json_timestamp_included():
