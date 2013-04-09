@@ -26,11 +26,10 @@ def test_json_timestamp_generated():
     }
 
     tsrange = TimestampRange()
-    tsrange.start()
-    p = Popen('logship --json -s stdout',
-              shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
-    tsrange.finish()
+    with tsrange:
+        p = Popen('logship --json -s stdout',
+                  shell=True, stdout=PIPE, stdin=PIPE)
+        data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
     output_dict = json.loads(data_out.decode("utf-8"))
     output_ts = output_dict.pop('@timestamp')

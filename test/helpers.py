@@ -19,19 +19,20 @@ class TimestampRange(object):
     """
     Helper for timestamp creations which can't be mocked.
 
-    Call ``start()` and ``finish()`` either side of the method which creates
-    the timestamp. Then call ``assert_in_range(string)`` with the timestamp
-    string that you want to test. It will assert that it is within the upper
-    and lower bands expected. Times should be ISO8601 UTC.
+    Provides a ``with`` context manager which can be used to wrap operations
+    that generate a timestamp. When complete, a resulting timestamp string
+    can be passed to ``assert_in_range(string)`` in order to assert that it
+    falls within the start and finish time of the context. All times should
+    be ISO8601 UTC.
     """
     def __init__(self):
         self.lower = None
         self.upper = None
 
-    def start(self):
+    def __enter__(self):
         self.lower = datetime.utcnow()
 
-    def finish(self):
+    def __exit__(self, type, value, traceback):
         self.upper = datetime.utcnow()
 
     def assert_in_range(self, ts_string):
