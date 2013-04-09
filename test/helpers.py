@@ -35,5 +35,4 @@ class TimestampRange:
 
     def assert_inrange(self, ts_string):
         ts = datetime.strptime(ts_string, '%Y-%m-%dT%H:%M:%S.%fZ')
-        assert(self.lower < ts)
-        assert(self.upper > ts)
+        assert_true(self.lower < ts < self.upper)
