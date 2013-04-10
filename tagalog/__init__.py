@@ -6,7 +6,7 @@ import logging
 
 from tagalog import io
 
-__all__ = ['io', 'stamp', 'tag', 'fields']
+__all__ = ['io', 'stamp', 'source_host', 'tag', 'fields']
 __version__ = '0.2.5'
 
 # Use UTF8 for stdin, stdout, stderr
@@ -60,6 +60,15 @@ def stamp(iterable, key='@timestamp'):
     for item in iterable:
         if not key in item:
             item[key] = now()
+        yield item
+
+def source_host(iterable, source_host=None):
+    """
+    Calculate the source host for each dict or dict-like object in ``iterable``...
+    """
+    for item in iterable:
+        if not source_host in item:
+            item['@source_host'] = 'default'
         yield item
 
 def fields(iterable, fields=None):
