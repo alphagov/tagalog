@@ -8,7 +8,7 @@ def test_tags():
     p = Popen('logship --no-stamp -s stdout -t handbags great',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
-    assert_equal({'@message': 'hello', '@tags': ['handbags', 'great']},
+    assert_equal({'@message': 'hello', '@source_host': 'default', '@tags': ['handbags', 'great']},
                  json.loads(data_out.decode("utf-8")))
 
 
@@ -16,12 +16,12 @@ def test_fields():
     p = Popen('logship --no-stamp -s stdout -f handbags=great why=because',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
-    assert_equal({'@message': 'hello', '@fields': { 'handbags': 'great', 'why': 'because'}},
+    assert_equal({'@message': 'hello', '@source_host': 'default', '@fields': { 'handbags': 'great', 'why': 'because'}},
                  json.loads(data_out.decode("utf-8")))
 
 
 def test_source_host():
-    p = Popen('logship --no-stamp -s stdout --source_host gorilla.zoo.tld',
+    p = Popen('logship --no-stamp -s stdout --source-host gorilla.zoo.tld',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
     assert_equal({'@source_host': 'gorilla.zoo.tld', '@message': 'hello'},
@@ -49,6 +49,7 @@ def test_json_timestamp_generated():
 def test_json_timestamp_included():
     input_dict = {
       '@timestamp': '2013-01-01T09:00:00.000000Z',
+      '@source_host': 'default',
       '@fields': {'handbags': 'great', 'why': 'because'},
     }
 
@@ -61,6 +62,7 @@ def test_json_timestamp_included():
 def test_json_tags():
     input_dict = {
       '@timestamp': '2013-01-01T09:00:00.000000Z',
+      '@source_host': 'default',
       '@fields': {'handbags': 'great', 'why': 'because'},
       '@tags': ['handbags'],
     }
@@ -76,6 +78,7 @@ def test_json_tags():
 def test_json_fields():
     input_dict = {
       '@timestamp': '2013-01-01T09:00:00.000000Z',
+      '@source_host': 'default',
       '@fields': {'handbags': 'great', 'why': 'because'},
     }
 
