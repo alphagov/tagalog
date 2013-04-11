@@ -17,14 +17,14 @@ def test_no_source_host_defaults():
 
 
 def test_source_host_provided():
-    data = [{'@source_host': 'orangutan.zoo.tld', '@message': 'one'},
-            {'@source_host': 'orangutan.zoo.tld', '@message': 'two'},
-            {'@source_host': 'orangutan.zoo.tld', '@message': 'three'}]
+    data = [{'@message': 'one'},
+            {'@message': 'two'},
+            {'@message': 'three'}]
     out = source_host(data, source_host='chimpanzee.zoo.tld')
 
-    assert_equal(next(out), {'@source_host': 'orangutan.zoo.tld', '@message': 'one'})
-    assert_equal(next(out), {'@source_host': 'orangutan.zoo.tld', '@message': 'two'})
-    assert_equal(next(out), {'@source_host': 'orangutan.zoo.tld', '@message': 'three'})
+    assert_equal(next(out), {'@source_host': 'chimpanzee.zoo.tld', '@message': 'one'})
+    assert_equal(next(out), {'@source_host': 'chimpanzee.zoo.tld', '@message': 'two'})
+    assert_equal(next(out), {'@source_host': 'chimpanzee.zoo.tld', '@message': 'three'})
 
 
 def test_source_host_provided_custom_key():

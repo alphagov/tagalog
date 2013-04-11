@@ -55,21 +55,31 @@ def stamp(iterable, key='@timestamp'):
     ``iterable``, adding an accurate timestamp to each one when received. The
     timestamp is a usecond-precision ISO8601 string. The timestamp is added to
     each dict with a key set by ``key`` unless the dict already contains
-    it's own.
+    its own.
     """
     for item in iterable:
         if not key in item:
             item[key] = now()
         yield item
 
-def source_host(iterable, source_host=None):
+def source_host(iterable, source_host=None, key='@source_host'):
     """
-    Calculate the source host for each dict or dict-like object in ``iterable``...
+    Add the source host for each dict or dict-like object in ``iterable``.
+    This can be passed by the app itself, or can be passed as a command-line
+    argument. If neither of these is the case, Tagalog will calculate the
+    source host. #TODO
+
     """
     for item in iterable:
-        if not source_host in item:
-            item['@source_host'] = 'default'
-        yield item
+        if key in item:
+          yield item
+
+        else:
+          if source_host:
+            item[key] = source_host
+          else:
+            item[key] = 'default'
+          yield item
 
 def fields(iterable, fields=None):
     """
