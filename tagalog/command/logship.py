@@ -4,7 +4,7 @@ import json
 import sys
 import textwrap
 
-from tagalog import io, stamp, tag, fields
+from tagalog import io, stamp, source_host, tag, fields
 from tagalog import messages, json_messages
 from tagalog import shipper
 
@@ -19,6 +19,8 @@ parser.add_argument('-s', '--shipper', default='redis',
                     help='Select the shipper to be used to ship logs')
 parser.add_argument('-j', '--json', action='store_true',
                     help='Content is already JSON')
+parser.add_argument('--source-host', default=None,
+                    help='Set the source host')
 parser.add_argument('--no-stamp', action='store_true')
 parser.add_argument('--bulk', action='store_true',
                     help='Send log data in elasticsearch bulk format')
@@ -41,6 +43,8 @@ def main():
         msgs = json_messages(lines)
     else:
         msgs = messages(lines)
+
+    msgs = source_host(msgs, args.source_host)
 
     if not args.no_stamp:
         msgs = stamp(msgs)

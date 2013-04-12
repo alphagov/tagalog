@@ -6,7 +6,7 @@ import logging
 
 from tagalog import io
 
-__all__ = ['io', 'stamp', 'tag', 'fields']
+__all__ = ['io', 'stamp', 'source_host', 'tag', 'fields']
 __version__ = '0.2.5'
 
 # Use UTF8 for stdin, stdout, stderr
@@ -55,11 +55,23 @@ def stamp(iterable, key='@timestamp'):
     ``iterable``, adding an accurate timestamp to each one when received. The
     timestamp is a usecond-precision ISO8601 string. The timestamp is added to
     each dict with a key set by ``key`` unless the dict already contains
-    it's own.
+    its own.
     """
     for item in iterable:
         if not key in item:
             item[key] = now()
+        yield item
+
+def source_host(iterable, source_host=None, key='@source_host'):
+    """
+    Add the source host for each dict or dict-like object in ``iterable``,
+    if it is provided. This can be passed by the app itself, or can be passed
+    as a command-line
+    argument.
+    """
+    for item in iterable:
+        if source_host != None and not key in item:
+            item[key] = source_host
         yield item
 
 def fields(iterable, fields=None):

@@ -20,6 +20,14 @@ def test_fields():
                  json.loads(data_out.decode("utf-8")))
 
 
+def test_source_host():
+    p = Popen('logship --no-stamp -s stdout --source-host gorilla.zoo.tld',
+              shell=True, stdout=PIPE, stdin=PIPE)
+    data_out, _ = p.communicate(input='hello'.encode("utf-8"))
+    assert_equal({'@source_host': 'gorilla.zoo.tld', '@message': 'hello'},
+                 json.loads(data_out.decode("utf-8")))
+
+
 def test_json_timestamp_generated():
     # Skipped until we figure out a way to mock tagalog._now() as
     # datetime.datetime(2013, 1, 1, 9, 0, 0, 0). I suspect it's not possible
@@ -76,4 +84,18 @@ def test_json_fields():
     data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
     input_dict['@fields']['cannot'] = 'comprehend'
+    assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
+
+
+def test_json_source_host():
+    input_dict = {
+      '@timestamp': '2013-01-01T09:00:00.000000Z',
+      '@messages': 'Callithrix, Cebuella, Callibella, and Mico',
+    }
+
+    p = Popen('logship --json -s stdout --source-host marmoset.zoo.tld',
+              shell=True, stdout=PIPE, stdin=PIPE)
+    data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
+
+    input_dict['@source_host'] = 'marmoset.zoo.tld'
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
