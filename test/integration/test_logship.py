@@ -8,7 +8,7 @@ def test_tags():
     p = Popen('logship --no-stamp -s stdout -t handbags great',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
-    assert_equal({'@message': 'hello', '@source_host': None, '@tags': ['handbags', 'great']},
+    assert_equal({'@message': 'hello', '@tags': ['handbags', 'great']},
                  json.loads(data_out.decode("utf-8")))
 
 
@@ -16,7 +16,7 @@ def test_fields():
     p = Popen('logship --no-stamp -s stdout -f handbags=great why=because',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
-    assert_equal({'@message': 'hello', '@source_host': None, '@fields': { 'handbags': 'great', 'why': 'because'}},
+    assert_equal({'@message': 'hello', '@fields': { 'handbags': 'great', 'why': 'because'}},
                  json.loads(data_out.decode("utf-8")))
 
 

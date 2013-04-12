@@ -9,9 +9,9 @@ def test_no_source_host():
             {'@message': 'three'}]
     out = source_host(data)
 
-    assert_equal(next(out), {'@message': 'one', '@source_host': None})
-    assert_equal(next(out), {'@message': 'two', '@source_host': None})
-    assert_equal(next(out), {'@message': 'three', '@source_host': None})
+    assert_equal(next(out), {'@message': 'one'})
+    assert_equal(next(out), {'@message': 'two'})
+    assert_equal(next(out), {'@message': 'three'})
 
 
 def test_source_host_provided():

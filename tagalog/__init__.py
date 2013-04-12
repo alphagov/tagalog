@@ -70,8 +70,8 @@ def source_host(iterable, source_host=None, key='@source_host'):
     argument.
     """
     for item in iterable:
-        if not key in item:
-          item[key] = source_host
+        if source_host != None and not key in item:
+            item[key] = source_host
         yield item
 
 def fields(iterable, fields=None):
