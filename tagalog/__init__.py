@@ -64,22 +64,15 @@ def stamp(iterable, key='@timestamp'):
 
 def source_host(iterable, source_host=None, key='@source_host'):
     """
-    Add the source host for each dict or dict-like object in ``iterable``.
-    This can be passed by the app itself, or can be passed as a command-line
-    argument. If neither of these is the case, Tagalog will calculate the
-    source host. #TODO
-
+    Add the source host for each dict or dict-like object in ``iterable``,
+    if it is provided. This can be passed by the app itself, or can be passed
+    as a command-line
+    argument.
     """
     for item in iterable:
-        if key in item:
-          yield item
-
-        else:
-          if source_host:
-            item[key] = source_host
-          else:
-            item[key] = 'default'
-          yield item
+        if not key in item:
+          item[key] = source_host
+        yield item
 
 def fields(iterable, fields=None):
     """
