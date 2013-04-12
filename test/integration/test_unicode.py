@@ -14,6 +14,18 @@ def test_unicode():
     assert_equal(data_in, data_out)
 
 
+def test_unicode_json():
+    data_in = fixture('utf8-demo.txt').read()
+
+    p = Popen('logtag --no-stamp | logship --no-stamp --json -s stdout | logtext',
+              shell=True,
+              stdout=PIPE,
+              stdin=PIPE)
+    data_out, _ = p.communicate(data_in)
+
+    assert_equal(data_in, data_out)
+
+
 def test_broken_unicode():
     data_in = fixture('utf8-test.txt').read()
 
