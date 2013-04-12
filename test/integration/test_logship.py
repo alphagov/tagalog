@@ -49,7 +49,6 @@ def test_json_timestamp_generated():
 def test_json_timestamp_included():
     input_dict = {
       '@timestamp': '2013-01-01T09:00:00.000000Z',
-      '@source_host': None,
       '@fields': {'handbags': 'great', 'why': 'because'},
     }
 
@@ -62,7 +61,6 @@ def test_json_timestamp_included():
 def test_json_tags():
     input_dict = {
       '@timestamp': '2013-01-01T09:00:00.000000Z',
-      '@source_host': None,
       '@fields': {'handbags': 'great', 'why': 'because'},
       '@tags': ['handbags'],
     }
@@ -78,7 +76,6 @@ def test_json_tags():
 def test_json_fields():
     input_dict = {
       '@timestamp': '2013-01-01T09:00:00.000000Z',
-      '@source_host': None,
       '@fields': {'handbags': 'great', 'why': 'because'},
     }
 
