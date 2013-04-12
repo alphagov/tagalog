@@ -1,6 +1,6 @@
-from ..helpers import assert_equal
-from nose.plugins.skip import SkipTest
+from ..helpers import assert_equal, TimestampRange
 from subprocess import Popen, PIPE
+
 import json
 
 
@@ -29,21 +29,20 @@ def test_source_host():
 
 
 def test_json_timestamp_generated():
-    # Skipped until we figure out a way to mock tagalog._now() as
-    # datetime.datetime(2013, 1, 1, 9, 0, 0, 0). I suspect it's not possible
-    # with the use of subprocess to spawn a separate interpreter.
-    raise SkipTest
-
     input_dict = {
       '@fields': {'handbags': 'great', 'why': 'because'}
     }
 
-    p = Popen('logship --json -s stdout',
-              shell=True, stdout=PIPE, stdin=PIPE)
-    data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
+    tsrange = TimestampRange()
+    with tsrange:
+        p = Popen('logship --json -s stdout',
+                  shell=True, stdout=PIPE, stdin=PIPE)
+        data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
-    input_dict['@timestamp'] = '2013-01-01T09:00:00.000000Z'
-    assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
+    output_dict = json.loads(data_out.decode("utf-8"))
+    output_ts = output_dict.pop('@timestamp')
+    assert_equal(input_dict, output_dict)
+    tsrange.assert_in_range(output_ts)
 
 
 def test_json_timestamp_included():
