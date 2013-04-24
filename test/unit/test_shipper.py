@@ -1,7 +1,9 @@
 from ..helpers import *
 import os
+import redis
 from tagalog.shipper import IShipper
-from tagalog.shipper import ConnectionError, RoundRobinConnectionPool
+from tagalog.shipper import RoundRobinConnectionPool
+from tagalog.shipper import RedisShipper
 from tagalog.shipper import register_shipper, unregister_shipper, get_shipper
 
 
@@ -144,8 +146,31 @@ class TestRoundRobinConnectionPool(object):
                                      max_connections_per_pattern=1)
         p.get_connection('SET')
         p.get_connection('SET')
-        assert_raises(ConnectionError, p.get_connection, 'SET')
+        assert_raises(redis.ConnectionError, p.get_connection, 'SET')
 
+
+class TestRedisShipper(object):
+
+    def setup(self):
+        self.args = MagicMock()
+        self.args.urls = ["redis://foo", "redis://bar"]
+        self.args.key = "logs"
+
+    @patch('tagalog.shipper.ResilientStrictRedis')
+    def test_ship_catches_connection_errors(self, redis_mock):
+        rs = RedisShipper(self.args)
+        redis_mock.return_value.lpush.side_effect = redis.ConnectionError("Boom!")
+
+        # should not raise:
+        rs.ship("foo")
+
+    @patch('tagalog.shipper.ResilientStrictRedis')
+    def test_ship_catches_response_errors(self, redis_mock):
+        rs = RedisShipper(self.args)
+        redis_mock.return_value.lpush.side_effect = redis.ResponseError("Boom!")
+
+        # should not raise:
+        rs.ship("foo")
 
 def test_shipper_registration():
     register_shipper('myshipper', MyShipper)

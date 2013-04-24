@@ -2,7 +2,7 @@ import os
 from itertools import chain
 import logging
 
-from redis import Connection, ConnectionError, StrictRedis
+from redis import Connection, ConnectionError, RedisError, StrictRedis
 
 from tagalog._compat import urlparse, _xrange
 
@@ -192,7 +192,7 @@ class RedisShipper(IShipper):
     def ship(self, msg):
         try:
             self.rc.lpush(self.key, msg)
-        except ConnectionError as e:
+        except RedisError as e:
             log.warn('Could not ship message: {0}'.format(e))
 
     def _parse_url(self, url):
