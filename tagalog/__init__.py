@@ -7,7 +7,7 @@ import logging
 from tagalog import io
 
 __all__ = ['io', 'stamp', 'source_host', 'tag', 'fields']
-__version__ = '0.2.6'
+__version__ = '0.2.7'
 
 # Use UTF8 for stdin, stdout, stderr
 os.environ['PYTHONIOENCODING'] = 'utf-8'
