@@ -54,9 +54,6 @@ def main():
         msgs = fields(msgs, args.fields)
     for msg in msgs:
         payload = json.dumps(msg)
-        if args.bulk:
-            command = json.dumps({'index': {'_index': args.bulk_index, '_type': args.bulk_type}})
-            payload = '{0}\n{1}\n'.format(command, payload)
         shpr.ship(payload)
 
 if __name__ == '__main__':

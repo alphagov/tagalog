@@ -1,4 +1,5 @@
 import os
+import json
 from itertools import chain
 import logging
 
@@ -219,6 +220,9 @@ class RedisShipper(IShipper):
 class StdoutShipper(IShipper):
 
     def ship(self, msg):
+        if self.args.bulk:
+            command = json.dumps({'index': {'_index': self.args.bulk_index, '_type': self.args.bulk_type}})
+            msg = '{0}\n{1}\n'.format(command, msg)
         print(msg)
 
 
