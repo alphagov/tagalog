@@ -17,7 +17,7 @@ def test_elasticsearch_bulk_format():
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
 
-    assert_equal(u'{"index": {"_type": "message", "_index": "logs-current"}}\n{"@message": "hello"}\n\n',
+    assert_equal('{"index": {"_type": "message", "_index": "logs-current"}}\n{"@message": "hello"}\n\n',
                  data_out.decode("utf-8"))
 
 def test_fields():
