@@ -12,6 +12,14 @@ def test_tags():
                  json.loads(data_out.decode("utf-8")))
 
 
+def test_elasticsearch_bulk_format():
+    p = Popen('logship --no-stamp -s stdout --bulk --bulk-index logs-current',
+              shell=True, stdout=PIPE, stdin=PIPE)
+    data_out, _ = p.communicate(input='hello'.encode("utf-8"))
+
+    assert_equal(u'{"index": {"_type": "message", "_index": "logs-current"}}\n{"@message": "hello"}\n\n',
+                 data_out.decode("utf-8"))
+
 def test_fields():
     p = Popen('logship --no-stamp -s stdout -f handbags=great why=because',
               shell=True, stdout=PIPE, stdin=PIPE)
