@@ -29,10 +29,10 @@ class IShipper(object):
     def ship(self, message):
         raise NotImplementedError('IShipper subclasses should implement the "ship" method!')
 
-    def elasticsearch_bulk_decorate(self, msg):
-        command = json.dumps({'index': {'_index': self.args.bulk_index, '_type': self.args.bulk_type}})
-        return '{0}\n{1}\n'.format(command, msg)
 
+def elasticsearch_bulk_decorate(bulk_index, bulk_type, msg):
+    command = json.dumps({'index': {'_index': bulk_index, '_type': bulk_type}})
+    return '{0}\n{1}\n'.format(command, msg)
 
 
 class RoundRobinConnectionPool(object):
@@ -197,7 +197,7 @@ class RedisShipper(IShipper):
 
     def ship(self, msg):
         if self.args.bulk:
-            msg = self.elasticsearch_bulk_decorate(msg)
+            msg = elasticsearch_bulk_decorate(self.args.bulk_index,self.args.bulk_type,msg)
         try:
             self.rc.lpush(self.key, msg)
         except RedisError as e:
@@ -228,7 +228,7 @@ class StdoutShipper(IShipper):
 
     def ship(self, msg):
         if self.args.bulk:
-            msg = self.elasticsearch_bulk_decorate(msg)
+            msg = elasticsearch_bulk_decorate(self.args.bulk_index,self.args.bulk_type,msg)
         print(msg)
 
 
