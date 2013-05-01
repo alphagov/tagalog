@@ -2,10 +2,11 @@ from __future__ import unicode_literals
 from ..helpers import assert_equal, fixture
 from subprocess import Popen, PIPE
 
+
 def test_unicode():
     data_in = fixture('utf8-demo.txt').read()
 
-    p = Popen('logtag --no-stamp | logtext',
+    p = Popen('logtag -f init_txt | logtext',
               shell=True,
               stdout=PIPE,
               stdin=PIPE)
@@ -17,7 +18,7 @@ def test_unicode():
 def test_unicode_json():
     data_in = fixture('utf8-demo.txt').read()
 
-    p = Popen('logtag --no-stamp | logship --no-stamp --json -s stdout | logtext',
+    p = Popen('logtag -f init_txt | logship -f init_json -s stdout | logtext',
               shell=True,
               stdout=PIPE,
               stdin=PIPE)
@@ -29,7 +30,7 @@ def test_unicode_json():
 def test_broken_unicode():
     data_in = fixture('utf8-test.txt').read()
 
-    p = Popen('logtag --no-stamp | logtext',
+    p = Popen('logtag -f init_txt | logtext',
               shell=True,
               stdout=PIPE,
               stdin=PIPE)

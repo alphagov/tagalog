@@ -1,49 +1,49 @@
-from ..helpers import assert_equal, TimestampRange
+from ..helpers import assert_equal, assert_true, TimestampRange
 from subprocess import Popen, PIPE
 
 import json
+import socket
 
 
-def test_tags():
-    p = Popen('logship --no-stamp -s stdout -t handbags great',
-              shell=True, stdout=PIPE, stdin=PIPE)
+def test_defaults():
+    p = Popen('logship -s stdout', shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
-    assert_equal({'@message': 'hello', '@tags': ['handbags', 'great']},
-                 json.loads(data_out.decode("utf-8")))
+    json_out = json.loads(data_out.decode("utf-8"))
+    assert_equal('hello', json_out['@message'])
+    assert_true('@timestamp' in json_out)
+    assert_true('@source_host' in json_out)
 
 
 def test_elasticsearch_bulk_format():
-    p = Popen('logship --no-stamp -s stdout --bulk --bulk-index logs-current',
+    p = Popen('logship -f init_txt -s stdout --bulk --bulk-index logs-current',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
 
     assert_equal('{"index": {"_type": "message", "_index": "logs-current"}}\n{"@message": "hello"}\n\n',
                  data_out.decode("utf-8"))
 
-def test_fields():
-    p = Popen('logship --no-stamp -s stdout -f handbags=great why=because',
+def test_add_tags():
+    p = Popen('logship -s stdout -f init_txt,add_tags:handbags:great',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
-    assert_equal({'@message': 'hello', '@fields': { 'handbags': 'great', 'why': 'because'}},
+    assert_equal({'@message': 'hello', '@tags': ['handbags', 'great']},
                  json.loads(data_out.decode("utf-8")))
 
 
-def test_source_host():
-    p = Popen('logship --no-stamp -s stdout --source-host gorilla.zoo.tld',
+def test_fields():
+    p = Popen('logship -s stdout -f init_txt,add_fields:handbags=great:why=because',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
-    assert_equal({'@source_host': 'gorilla.zoo.tld', '@message': 'hello'},
+    assert_equal({'@message': 'hello', '@fields': {'handbags': 'great', 'why': 'because'}},
                  json.loads(data_out.decode("utf-8")))
 
 
 def test_json_timestamp_generated():
-    input_dict = {
-      '@fields': {'handbags': 'great', 'why': 'because'}
-    }
+    input_dict = {'@fields': {'handbags': 'great', 'why': 'because'}}
 
     tsrange = TimestampRange()
     with tsrange:
-        p = Popen('logship --json -s stdout',
+        p = Popen('logship -s stdout -f init_json,add_timestamp',
                   shell=True, stdout=PIPE, stdin=PIPE)
         data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
@@ -59,7 +59,7 @@ def test_json_timestamp_included():
       '@fields': {'handbags': 'great', 'why': 'because'},
     }
 
-    p = Popen('logship --json -s stdout',
+    p = Popen('logship -f init_json -s stdout',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
@@ -72,7 +72,7 @@ def test_json_tags():
       '@tags': ['handbags'],
     }
 
-    p = Popen('logship --json -s stdout -t why',
+    p = Popen('logship -f init_json,add_tags:why -s stdout',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
@@ -86,7 +86,7 @@ def test_json_fields():
       '@fields': {'handbags': 'great', 'why': 'because'},
     }
 
-    p = Popen('logship --json -s stdout -f cannot=comprehend',
+    p = Popen('logship -f init_json,add_fields:cannot=comprehend -s stdout',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
@@ -100,9 +100,9 @@ def test_json_source_host():
       '@messages': 'Callithrix, Cebuella, Callibella, and Mico',
     }
 
-    p = Popen('logship --json -s stdout --source-host marmoset.zoo.tld',
+    p = Popen('logship -f init_json,add_source_host -s stdout',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
-    input_dict['@source_host'] = 'marmoset.zoo.tld'
+    input_dict['@source_host'] = socket.getfqdn()
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))

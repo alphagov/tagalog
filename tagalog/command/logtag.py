@@ -1,31 +1,34 @@
-from __future__ import print_function, unicode_literals
+from __future__ import print_function
 import argparse
+import csv
 import json
 import sys
 import textwrap
 
-from tagalog import io, fields, messages, stamp, tag
+from tagalog import io, filters
 
-parser = argparse.ArgumentParser(description=textwrap.dedent("""
-    Convert log data on STDIN to a stream of timestamped JSON documents on STDOUT,
-    optionally adding tags and data fields to the processed log lines."""))
-parser.add_argument('-t', '--tags', nargs='+')
-parser.add_argument('-f', '--fields', nargs='+',
-                    help='Add key=value fields specified to each request')
-parser.add_argument('--no-stamp', action='store_true')
+DEFAULT_FILTERS = 'init_txt,add_timestamp,add_source_host'
+
+parser = argparse.ArgumentParser(description="Convert log data on STDIN to a "
+                                             "stream of timestamped JSON "
+                                             "documents on STDOUT.")
+parser.add_argument('-f', '--filters', default=DEFAULT_FILTERS,
+                    help='a list of filters to apply to each log line')
+parser.add_argument('-a', '--filters-append', action='append',
+                    help='A list of filters to apply to each log line '
+                         '(appended to the default filter set)')
 
 
 def main():
     args = parser.parse_args()
-    msgs = messages(io.lines(sys.stdin))
-    if not args.no_stamp:
-        msgs = stamp(msgs)
-    if args.tags:
-        msgs = tag(msgs, args.tags)
-    if args.fields:
-        msgs = fields(msgs, args.fields)
-    for msg in msgs:
+    filterlist = [args.filters]
+    if args.filters_append:
+        filterlist.extend(args.filters_append)
+    pipeline = filters.build(','.join(filterlist))
+
+    for msg in pipeline(io.lines(sys.stdin)):
         print(json.dumps(msg))
+
 
 if __name__ == '__main__':
     main()

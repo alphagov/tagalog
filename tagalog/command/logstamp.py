@@ -1,7 +1,8 @@
 from __future__ import print_function, unicode_literals
 import sys
 
-from tagalog import io, now
+from tagalog import io
+from tagalog.filters import now
 
 
 def main():
