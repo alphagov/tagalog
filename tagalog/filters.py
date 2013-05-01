@@ -27,9 +27,8 @@ def pipeline(head, *tail):
 def build(description):
     """Build a filter chain from a filter description string"""
     filters = next(csv.reader([description]))
-    with_args = [f for f in csv.reader(filters, delimiter=':')]
-    funcs = [get(f[0], f[1:]) for f in with_args]
-    return pipeline(*funcs)
+    filter_funcs = [get(f[0], f[1:]) for f in csv.reader(filters, delimiter=':')]
+    return pipeline(*filter_funcs)
 
 
 def get(name, args=[]):
