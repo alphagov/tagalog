@@ -196,10 +196,11 @@ class RedisShipper(IShipper):
         self.rc.execution_attempts = self.pool.num_patterns
 
     def ship(self, msg):
+        payload = json.dumps(msg)
         if self.args.bulk:
-            msg = elasticsearch_bulk_decorate(self.args.bulk_index,self.args.bulk_type,msg)
+            payload = elasticsearch_bulk_decorate(self.args.bulk_index,self.args.bulk_type,payload)
         try:
-            self.rc.lpush(self.key, msg)
+            self.rc.lpush(self.key, payload)
         except RedisError as e:
             log.warn('Could not ship message: {0}'.format(e))
 
@@ -227,9 +228,10 @@ class RedisShipper(IShipper):
 class StdoutShipper(IShipper):
 
     def ship(self, msg):
+        payload = json.dumps(msg)
         if self.args.bulk:
-            msg = elasticsearch_bulk_decorate(self.args.bulk_index,self.args.bulk_type,msg)
-        print(msg)
+            payload = elasticsearch_bulk_decorate(self.args.bulk_index,self.args.bulk_type,payload)
+        print(payload)
 
 
 class NullShipper(IShipper):

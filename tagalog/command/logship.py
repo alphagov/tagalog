@@ -53,8 +53,7 @@ def main():
     if args.fields:
         msgs = fields(msgs, args.fields)
     for msg in msgs:
-        payload = json.dumps(msg)
-        shpr.ship(payload)
+        shpr.ship(msg)
 
 if __name__ == '__main__':
     main()
