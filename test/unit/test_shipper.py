@@ -155,6 +155,7 @@ class TestRedisShipper(object):
         self.args = MagicMock()
         self.args.urls = ["redis://foo", "redis://bar"]
         self.args.key = "logs"
+        self.args.bulk = False
 
     @patch('tagalog.shipper.ResilientStrictRedis')
     def test_ship_catches_connection_errors(self, redis_mock):
