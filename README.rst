@@ -3,8 +3,8 @@ Tagalog
 
 A set of commandline tools for manipulating logfiles on the fly.
 
-.. image:: https://travis-ci.org/nickstenning/tagalog.png?branch=master
-   :target: https://travis-ci.org/nickstenning/tagalog
+.. image:: https://travis-ci.org/alphagov/tagalog.png?branch=master
+   :target: https://travis-ci.org/alphagov/tagalog
 
 Installation
 ------------
