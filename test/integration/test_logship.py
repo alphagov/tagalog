@@ -114,10 +114,10 @@ def test_json_source_host():
 @patch('tagalog.shipper.ResilientStrictRedis')
 def test_redis_shipper(redis_mock):
     fake_lines = MagicMock()
-    fake_lines.return_value = iter([u'rawLogLine\n'])
+    fake_lines.return_value = iter(['rawLogLine\n'])
 
     with patch("tagalog.io.lines", fake_lines):
         with patch("sys.argv", ['logship', '-f','init_txt','-k','redis_key']):
             logship.main()
 
-            redis_mock.return_value.lpush.assert_called_with(u'redis_key', '{"@message": "rawLogLine"}')
+            redis_mock.return_value.lpush.assert_called_with('redis_key', '{"@message": "rawLogLine"}')
