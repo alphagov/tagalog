@@ -1,5 +1,7 @@
 from ..helpers import assert_equal, assert_true, TimestampRange
 from subprocess import Popen, PIPE
+from mock import patch, MagicMock
+from tagalog.command import logship
 
 import json
 import socket
@@ -106,3 +108,16 @@ def test_json_source_host():
 
     input_dict['@source_host'] = socket.getfqdn()
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
+
+### redis shipper tests ###
+
+@patch('tagalog.shipper.ResilientStrictRedis')
+def test_redis_shipper(redis_mock):
+    fake_lines = MagicMock()
+    fake_lines.return_value = iter([u'rawLogLine\n'])
+
+    with patch("tagalog.io.lines", fake_lines):
+        with patch("sys.argv", ['logship', '-f','init_txt']):
+            logship.main()
+
+            redis_mock.return_value.lpush.assert_called_with(u'logs', '{"@message": "rawLogLine"}')
