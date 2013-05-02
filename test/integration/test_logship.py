@@ -117,7 +117,7 @@ def test_redis_shipper(redis_mock):
     fake_lines.return_value = iter([u'rawLogLine\n'])
 
     with patch("tagalog.io.lines", fake_lines):
-        with patch("sys.argv", ['logship', '-f','init_txt']):
+        with patch("sys.argv", ['logship', '-f','init_txt','-k','redis_key']):
             logship.main()
 
-            redis_mock.return_value.lpush.assert_called_with(u'logs', '{"@message": "rawLogLine"}')
+            redis_mock.return_value.lpush.assert_called_with(u'redis_key', '{"@message": "rawLogLine"}')
