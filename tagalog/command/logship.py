@@ -19,19 +19,9 @@ parser.add_argument('-f', '--filters', default=DEFAULT_FILTERS,
 parser.add_argument('-a', '--filters-append', action='append',
                     help='A list of filters to apply to each log line '
                          '(appended to the default filter set)')
-
 parser.add_argument('-s', '--shipper', default='redis',
                     help='Select the shipper to be used to ship logs')
-parser.add_argument('--bulk', action='store_true',
-                    help='Send log data in elasticsearch bulk format')
-parser.add_argument('--bulk-index', default='logs',
-                    help='Name of the elasticsearch index (default: logs)')
-parser.add_argument('--bulk-type', default='message',
-                    help='Name of the elasticsearch type (default: message)')
 
-# TODO: make these the responsibility of the redis shipper
-parser.add_argument('-k', '--key', default='logs')
-parser.add_argument('-u', '--urls', nargs='+', default=['redis://localhost:6379'])
 
 def parse_shipper(description):
     clauses = next(csv.reader([description])) #reading only a single line
@@ -50,10 +40,19 @@ def build_shipper(description):
     from argparse import Namespace
     args = Namespace()
     args.key = 'logs'
+    args.bulk = False
+    args.bulk_index = 'logs'
+    args.bulk_type = 'message'
 
     name, ship_args, kwargs = parse_shipper(description)
     if 'key' in kwargs:
         args.key = kwargs['key']
+    if 'bulk' in kwargs:
+        args.bulk = kwargs['bulk']
+    if 'bulk_index' in kwargs:
+        args.bulk_index = kwargs['bulk_index']
+    if 'bulk_type' in kwargs:
+        args.bulk_type = kwargs['bulk_type']
     args.urls = ship_args
 
     return shipper.get_shipper(name)(args)
@@ -61,7 +60,7 @@ def build_shipper(description):
 def main():
     args = parser.parse_args()
 
-    shpr = shipper.get_shipper(args.shipper)(args)
+    shpr = build_shipper(args.shipper)
 
     filterlist = [args.filters]
     if args.filters_append:

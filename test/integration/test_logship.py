@@ -17,7 +17,7 @@ def test_defaults():
 
 
 def test_elasticsearch_bulk_format():
-    p = Popen('logship -f init_txt -s stdout --bulk --bulk-index logs-current',
+    p = Popen('logship -f init_txt -s stdout,bulk=true,bulk_index=logs-current',
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
 
@@ -117,7 +117,7 @@ def test_redis_shipper(redis_mock):
     fake_lines.return_value = iter(['rawLogLine\n'])
 
     with patch("tagalog.io.lines", fake_lines):
-        with patch("sys.argv", ['logship', '-s', 'redis', '-f','init_txt','-k','redis_key']):
+        with patch("sys.argv", ['logship', '-s', 'redis,key=redis_key', '-f','init_txt']):
             logship.main()
 
             redis_mock.return_value.lpush.assert_called_with('redis_key', '{"@message": "rawLogLine"}')
