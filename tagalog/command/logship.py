@@ -3,6 +3,7 @@ import argparse
 import json
 import sys
 import textwrap
+import csv
 
 from tagalog import io
 from tagalog import filters
@@ -32,9 +33,30 @@ parser.add_argument('--bulk-type', default='message',
 parser.add_argument('-k', '--key', default='logs')
 parser.add_argument('-u', '--urls', nargs='+', default=['redis://localhost:6379'])
 
+def build_shipper(description):
+    """TODO: write"""
+    from argparse import Namespace
+    args = Namespace()
+    args.key = None
+    args.urls = ['redis://localhost:6379']
+
+    clauses = next(csv.reader([description])) #reading only a single line
+    shipper_class = shipper.get_shipper(clauses[0])
+    if(len(clauses) >1 ):
+        shipper_args = clauses[1:]
+
+        key_arg = shipper_args[0]
+        key,val = key_arg.split('=',1)
+
+        args.key = val
+
+    return shipper_class(args)
+
 def main():
     args = parser.parse_args()
+
     shpr = shipper.get_shipper(args.shipper)(args)
+
     filterlist = [args.filters]
     if args.filters_append:
         filterlist.extend(args.filters_append)
