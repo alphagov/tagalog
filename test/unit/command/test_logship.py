@@ -25,12 +25,18 @@ def test_build_redis_shipper_with_key_arg():
 
 ### method: parse_shipper
 def test_parse_shipper():
-    name, kwargs = logship.parse_shipper('null')
+    name, args, kwargs = logship.parse_shipper('null')
 
     assert_equal(name, 'null')
 
 def test_parse_shipper_with_kwarg():
-    name, kwargs = logship.parse_shipper('redis,key=nginx-logs')
+    name, args, kwargs = logship.parse_shipper('redis,key=nginx-logs')
 
     assert_equal(name, 'redis')
     assert_equal(kwargs, {'key':'nginx-logs'})
+
+def test_parse_shipper_with_arg():
+    name, args, kwargs = logship.parse_shipper('redis,redis://localhost:8379')
+
+    assert_equal(name, 'redis')
+    assert_equal(args, ['redis://localhost:8379'])

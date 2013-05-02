@@ -36,21 +36,25 @@ parser.add_argument('-u', '--urls', nargs='+', default=['redis://localhost:6379'
 def parse_shipper(description):
     clauses = next(csv.reader([description])) #reading only a single line
     kwargs = {}
+    args = []
     for clause in clauses[1:]:
-        key, val = clause.split("=")
-        kwargs[key] = val
-    return clauses[0], kwargs
+        if '=' in clause:
+            key, val = clause.split("=")
+            kwargs[key] = val
+        else:
+            args.append(clause)
+    return clauses[0], args, kwargs
 
 def build_shipper(description):
     """TODO: write"""
     from argparse import Namespace
     args = Namespace()
-    args.key = None
-    args.urls = ['redis://localhost:6379']
+    args.key = 'logs'
 
-    name, kwargs = parse_shipper(description)
+    name, ship_args, kwargs = parse_shipper(description)
     if 'key' in kwargs:
         args.key = kwargs['key']
+    args.urls = ship_args
 
     return shipper.get_shipper(name)(args)
 
