@@ -68,14 +68,5 @@ def build_shipper(description):
     args.bulk_type = 'message'
 
     name, ship_args, kwargs = parse_shipper(description)
-    if 'key' in kwargs:
-        args.key = kwargs['key']
-    if 'bulk' in kwargs:
-        args.bulk = kwargs['bulk']
-    if 'bulk_index' in kwargs:
-        args.bulk_index = kwargs['bulk_index']
-    if 'bulk_type' in kwargs:
-        args.bulk_type = kwargs['bulk_type']
-    args.urls = ship_args
 
-    return get_shipper(name)(args)
+    return get_shipper(name)(ship_args,kwargs)

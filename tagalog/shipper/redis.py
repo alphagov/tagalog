@@ -157,19 +157,22 @@ class ResilientStrictRedis(StrictRedis):
 
 class RedisShipper(IShipper):
 
-    def __init__(self, args):
-        self.args = args
-        self.key = args.key
+    def __init__(self, args, kwargs):
+        self.urls = args
+        self.key = kwargs.get('key','logs')
+        self.bulk = kwargs.get('bulk',False)
+        self.bulk_index = kwargs.get('bulk_index','logs')
+        self.bulk_type = kwargs.get('bulk_type','message')
 
-        patts = [self._parse_url(u) for u in args.urls]
+        patts = [self._parse_url(u) for u in self.urls]
         self.pool = RoundRobinConnectionPool(patterns=patts)
         self.rc = ResilientStrictRedis(connection_pool=self.pool)
         self.rc.execution_attempts = self.pool.num_patterns
 
     def ship(self, msg):
         payload = json.dumps(msg)
-        if self.args.bulk:
-            payload = elasticsearch_bulk_decorate(self.args.bulk_index,self.args.bulk_type,payload)
+        if self.bulk:
+            payload = elasticsearch_bulk_decorate(self.bulk_index,self.bulk_type,payload)
         try:
             self.rc.lpush(self.key, payload)
         except RedisError as e:
