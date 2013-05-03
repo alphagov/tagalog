@@ -1,10 +1,15 @@
 from __future__ import absolute_import
-import os
-import json
+from itertools import chain
 from redis import Connection, ConnectionError, RedisError, StrictRedis
 from tagalog.shipper.ishipper import IShipper
 from tagalog.shipper.formatter import elasticsearch_bulk_decorate
+from tagalog._compat import urlparse, _xrange
 
+import os
+import json
+import logging
+
+log = logging.getLogger(__name__)
 
 class RoundRobinConnectionPool(object):
     """

@@ -1,5 +1,9 @@
-import redis
+from ...helpers import assert_raises, assert_equal, assert_not_equal
 from tagalog.shipper.redis import RoundRobinConnectionPool,RedisShipper
+from mock import patch, MagicMock
+
+import os
+import redis
 
 
 class MockConnection(object):
@@ -143,14 +147,13 @@ class TestRoundRobinConnectionPool(object):
 class TestRedisShipper(object):
 
     def setup(self):
-        self.args = MagicMock()
-        self.args.urls = ["redis://foo", "redis://bar"]
-        self.args.key = "logs"
-        self.args.bulk = False
+        self.args = ["redis://foo", "redis://bar"]
+        self.kwargs = {'key': "logs",
+                       'bulk': False}
 
     @patch('tagalog.shipper.redis.ResilientStrictRedis')
     def test_ship_catches_connection_errors(self, redis_mock):
-        rs = RedisShipper(self.args)
+        rs = RedisShipper(self.args, self.kwargs)
         redis_mock.return_value.lpush.side_effect = redis.ConnectionError("Boom!")
 
         # should not raise:
@@ -158,7 +161,7 @@ class TestRedisShipper(object):
 
     @patch('tagalog.shipper.redis.ResilientStrictRedis')
     def test_ship_catches_response_errors(self, redis_mock):
-        rs = RedisShipper(self.args)
+        rs = RedisShipper(self.args, self.kwargs)
         redis_mock.return_value.lpush.side_effect = redis.ResponseError("Boom!")
 
         # should not raise:
