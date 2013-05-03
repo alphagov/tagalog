@@ -1,9 +1,5 @@
 import csv
-import os
-import json
-from itertools import chain
 
-from tagalog._compat import urlparse, _xrange
 from tagalog.shipper.redis import RedisShipper
 from tagalog.shipper.stdout import StdoutShipper
 from tagalog.shipper.ishipper import IShipper
