@@ -1,5 +1,6 @@
-from ..helpers import assert_equal, assert_raises, patch
 import datetime
+
+from ..helpers import assert_equal, assert_raises, patch
 from tagalog.filters import FilterError
 from tagalog.filters import pipeline, get, build
 from tagalog.filters import init_txt, init_json

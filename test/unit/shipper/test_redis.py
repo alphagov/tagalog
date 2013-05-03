@@ -1,9 +1,9 @@
-from ...helpers import assert_raises, assert_equal, assert_not_equal
-from tagalog.shipper.redis import RoundRobinConnectionPool,RedisShipper
-from mock import patch, MagicMock
-
 import os
 import redis
+from mock import patch, MagicMock
+
+from ...helpers import assert_raises, assert_equal, assert_not_equal
+from tagalog.shipper.redis import RoundRobinConnectionPool,RedisShipper
 
 
 class MockConnection(object):

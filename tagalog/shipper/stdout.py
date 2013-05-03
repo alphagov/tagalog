@@ -1,6 +1,7 @@
+import json
+
 from tagalog.shipper.formatter import format_as_json, format_as_elasticsearch_bulk_json
 from tagalog.shipper.ishipper import IShipper
-import json
 
 class StdoutShipper(IShipper):
     def __init__(self, args, kwargs):

@@ -1,7 +1,8 @@
-from ..helpers import assert_equal
 import atexit
 import os
 import tempfile
+
+from ..helpers import assert_equal
 from tagalog import io
 
 
