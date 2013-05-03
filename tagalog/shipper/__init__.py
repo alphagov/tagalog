@@ -60,12 +60,6 @@ def parse_shipper(description):
 
 def build_shipper(description):
     """TODO: write"""
-    from argparse import Namespace
-    args = Namespace()
-    args.key = 'logs'
-    args.bulk = False
-    args.bulk_index = 'logs'
-    args.bulk_type = 'message'
 
     name, ship_args, kwargs = parse_shipper(description)
 
