@@ -59,7 +59,7 @@ def parse_shipper(description):
     return clauses[0], args, kwargs
 
 def build_shipper(description):
-    """TODO: write"""
+    """Takes a command-line description of a shipper and build the relevant shipper from it"""
 
     name, ship_args, kwargs = parse_shipper(description)
 
