@@ -1,4 +1,4 @@
-from tagalog.shipper.formatter import elasticsearch_bulk_decorate
+from tagalog.shipper.formatter import format_as_json, format_as_elasticsearch_bulk_json
 from tagalog.shipper.ishipper import IShipper
 import json
 
@@ -12,7 +12,8 @@ class StdoutShipper(IShipper):
 
 
     def ship(self, msg):
-        payload = json.dumps(msg)
         if self.bulk:
-            payload = elasticsearch_bulk_decorate(self.bulk_index,self.bulk_type,payload)
+            payload = format_as_elasticsearch_bulk_json(self.bulk_index,self.bulk_type,msg)
+        else:
+            payload = format_as_json(msg)
         print(payload)
