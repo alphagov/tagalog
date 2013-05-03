@@ -3,7 +3,7 @@ import os
 import json
 from redis import Connection, ConnectionError, RedisError, StrictRedis
 from tagalog.shipper.ishipper import IShipper
-from tagalog.shipper.ishipper import elasticsearch_bulk_decorate
+from tagalog.shipper.formatter import elasticsearch_bulk_decorate
 
 
 class RoundRobinConnectionPool(object):

@@ -1,4 +1,4 @@
-from tagalog.shipper.ishipper import elasticsearch_bulk_decorate
+from tagalog.shipper.formatter import elasticsearch_bulk_decorate
 from tagalog.shipper.ishipper import IShipper
 import json
 
