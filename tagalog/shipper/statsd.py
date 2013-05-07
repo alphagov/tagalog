@@ -9,7 +9,8 @@ class StatsdShipper(IShipper):
         self.metric = kwargs.get('metric', '%{@source_host}.%{@fields.status}')
 
     def ship(self, msg):
-        self.sock.sendto(self.__statsd_msg(msg), ('127.0.0.1',8125))
+        real_msg = self.__statsd_msg(msg).encode('utf-8')
+        self.sock.sendto(real_msg, ('127.0.0.1',8125))
 
     def __statsd_msg(self, msg):
         pattern = r'%{([^}]*)}'
