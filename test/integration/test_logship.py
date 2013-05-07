@@ -164,7 +164,7 @@ def test_stdout_and_statsd_shipper():
     result_statsd = sock.recv(1024)
 
     assert_equal(result_statsd, "road-runner:1|c".encode('utf-8'))
-    assert_equal(json.loads(result_stdout), input_dict)
+    assert_equal(json.loads(result_stdout.decode('utf-8')), input_dict)
 
 ### Setup Functions
 
