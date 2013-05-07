@@ -123,6 +123,7 @@ def test_statsd_shipper():
     p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
     data = sock.recv(1024)
+    sock.close()
 
     assert_equal(data, "fred-flintstone.500:1|c".encode('utf-8'))
 
@@ -162,6 +163,7 @@ def test_stdout_and_statsd_shipper():
 
     result_stdout, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
     result_statsd = sock.recv(1024)
+    sock.close()
 
     assert_equal(result_statsd, "road-runner:1|c".encode('utf-8'))
     assert_equal(json.loads(result_stdout.decode('utf-8')), input_dict)
