@@ -126,7 +126,7 @@ def test_statsd_shipper():
 
     data = sock.recv(2048)
 
-    assert_equal(data, "fred-flintstone.500:1|c")
+    assert_equal(data, "fred-flintstone.500:1|c".encode('utf-8'))
 
 
 ### redis shipper tests ###
