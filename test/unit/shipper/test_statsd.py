@@ -1,5 +1,5 @@
 from mock import patch
-from socket import socket
+import socket
 
 from tagalog.shipper.statsd import StatsdShipper
 
@@ -21,3 +21,12 @@ class TestStatsdShipper(object):
 
         socket_mock.return_value.sendto.assert_called_with('wilmaaaaa:1|c'.encode('utf-8'),
                 ('statsd.cluster',27623))
+
+    @patch('tagalog.shipper.statsd.socket')
+    def test_ship_when_socket_error_occurs(self, socket_mock):
+        kwargs = {'metric': '%{@source_host}', 'host': 'statsd.cluster', 'port': '27623'}
+        ss = StatsdShipper(None, kwargs)
+        socket_mock.return_value.sendto.side_effect = socket.error('generic socket error')
+
+        # should not raise
+        ss.ship({"@source_host":"wilmaaaaa"})

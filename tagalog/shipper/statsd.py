@@ -1,7 +1,11 @@
 from socket import socket, AF_INET, SOCK_DGRAM
+from socket import error as SocketError
 import re
+import logging
 
 from tagalog.shipper.ishipper import IShipper
+
+log = logging.getLogger(__name__)
 
 class StatsdShipper(IShipper):
     def __init__(self,args,kwargs):
@@ -13,7 +17,10 @@ class StatsdShipper(IShipper):
 
     def ship(self, msg):
         real_msg = self.__statsd_msg(msg).encode('utf-8')
-        self.sock.sendto(real_msg, self.statsd_addr)
+        try:
+            self.sock.sendto(real_msg, self.statsd_addr)
+        except SocketError as e:
+            log.warn("Could not ship message via StatsdShipper: {0}".format(e))
 
     def __statsd_msg(self, msg):
         pattern = r'%{([^}]*)}'
