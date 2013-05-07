@@ -1,3 +1,4 @@
+from ...helpers import assert_raises
 from mock import patch
 import socket
 
@@ -36,5 +37,5 @@ class TestStatsdShipper(object):
         kwargs = {'metric': '%{@source_host}', 'host': 'statsd.cluster', 'port': '27623'}
         socket_mock.return_value.connect.side_effect = socket.gaierror('Thats not a host name!')
 
-        # should not raise
-        ss = StatsdShipper(None, kwargs)
+        # should raise
+        assert_raises(socket.gaierror, StatsdShipper, None, kwargs)

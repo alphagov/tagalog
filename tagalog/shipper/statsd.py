@@ -12,10 +12,7 @@ class StatsdShipper(IShipper):
         self.metric = kwargs['metric']
         host = kwargs.get('host','127.0.0.1')
         port = int(kwargs.get('port','8125'))
-        try:
-            self.sock.connect((host, port))
-        except socket.gaierror as e:
-            log.warn("Could not ship messsage visa StatsdShipper: {0}".format(e))
+        self.sock.connect((host, port))
 
     def ship(self, msg):
         real_msg = self.__statsd_msg(msg).encode('utf-8')
