@@ -18,7 +18,7 @@ parser.add_argument('-f', '--filters', default=DEFAULT_FILTERS,
 parser.add_argument('-a', '--filters-append', action='append',
                     help='A list of filters to apply to each log line '
                          '(appended to the default filter set)')
-parser.add_argument('-s', '--shipper', nargs='+', default='redis',
+parser.add_argument('-s', '--shipper', nargs='+', default='redis,redis://localhost:6379',
                     help='Select the shipper to be used to ship logs')
 
 def main():
