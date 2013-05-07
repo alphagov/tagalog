@@ -2,6 +2,7 @@ import csv
 
 from tagalog.shipper.redis import RedisShipper
 from tagalog.shipper.stdout import StdoutShipper
+from tagalog.shipper.statsd import StatsdShipper
 from tagalog.shipper.ishipper import IShipper
 
 
@@ -34,6 +35,7 @@ def get_shipper(name):
 
 register_shipper('redis', RedisShipper)
 register_shipper('stdout', StdoutShipper)
+register_shipper('statsd', StatsdShipper)
 register_shipper('null', NullShipper)
 
 

@@ -109,6 +109,23 @@ def test_json_source_host():
     input_dict['@source_host'] = socket.getfqdn()
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
 
+### statsd shipper tests ###
+
+def test_statsd_shipper():
+    from socket import socket, AF_INET, SOCK_DGRAM
+
+    sock = socket(AF_INET, SOCK_DGRAM)
+    sock.bind(("127.0.0.1", 8125))
+    sock.settimeout(0.2)
+
+    p = Popen('logship -s statsd -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
+    p.communicate(input='{"@fields.status": 500,"@source_host":"fred-flintstone"}')
+
+    data = sock.recv(2048)
+
+    assert_equal(data, "fred-flintstone.500:1|c")
+
+
 ### redis shipper tests ###
 
 @patch('tagalog.shipper.redis.ResilientStrictRedis')
