@@ -148,12 +148,10 @@ class TestRedisShipper(object):
 
     def setup(self):
         self.args = ["redis://foo", "redis://bar"]
-        self.kwargs = {'key': "logs",
-                       'bulk': False}
 
     @patch('tagalog.shipper.redis.ResilientStrictRedis')
     def test_ship_catches_connection_errors(self, redis_mock):
-        rs = RedisShipper(self.args, self.kwargs)
+        rs = RedisShipper(self.args)
         redis_mock.return_value.lpush.side_effect = redis.ConnectionError("Boom!")
 
         # should not raise:
@@ -161,7 +159,7 @@ class TestRedisShipper(object):
 
     @patch('tagalog.shipper.redis.ResilientStrictRedis')
     def test_ship_catches_response_errors(self, redis_mock):
-        rs = RedisShipper(self.args, self.kwargs)
+        rs = RedisShipper(self.args)
         redis_mock.return_value.lpush.side_effect = redis.ResponseError("Boom!")
 
         # should not raise:
