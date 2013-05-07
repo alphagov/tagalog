@@ -1,10 +1,10 @@
-from ..helpers import assert_equal, assert_true, TimestampRange
+from socket import socket, AF_INET, SOCK_DGRAM, getfqdn
 from subprocess import Popen, PIPE
 from mock import patch, MagicMock
-from tagalog.command import logship
-
 import json
-import socket
+
+from ..helpers import assert_equal, assert_true, TimestampRange
+from tagalog.command import logship
 
 
 def test_defaults():
@@ -106,20 +106,23 @@ def test_json_source_host():
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
-    input_dict['@source_host'] = socket.getfqdn()
+    input_dict['@source_host'] = getfqdn()
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
 
 ### statsd shipper tests ###
 
 def test_statsd_shipper():
-    from socket import socket, AF_INET, SOCK_DGRAM
+    input_dict = {
+      '@source_host': 'fred-flintstone',
+      '@fields.status': 500,
+    }
 
     sock = socket(AF_INET, SOCK_DGRAM)
     sock.bind(("127.0.0.1", 8125))
     sock.settimeout(0.2)
 
     p = Popen('logship -s statsd -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
-    p.communicate(input='{"@fields.status": 500,"@source_host":"fred-flintstone"}')
+    p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
     data = sock.recv(2048)
 
