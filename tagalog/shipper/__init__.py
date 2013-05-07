@@ -14,6 +14,8 @@ class ShipperError(Exception):
 
 
 class NullShipper(IShipper):
+    def __init__(self, args):
+        pass
 
     def ship(self, msg):
         pass
@@ -56,4 +58,4 @@ def build_shipper(description):
 
     name, ship_args, kwargs = parse_shipper(description)
 
-    return get_shipper(name)(ship_args,kwargs)
+    return get_shipper(name)(ship_args, **kwargs)

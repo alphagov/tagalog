@@ -164,12 +164,12 @@ class ResilientStrictRedis(StrictRedis):
 
 class RedisShipper(IShipper):
 
-    def __init__(self, args, kwargs):
+    def __init__(self, args, key='logs', bulk=False, bulk_index='logs', bulk_type='message'):
         self.urls = args
-        self.key = kwargs.get('key','logs')
-        self.bulk = kwargs.get('bulk',False)
-        self.bulk_index = kwargs.get('bulk_index','logs')
-        self.bulk_type = kwargs.get('bulk_type','message')
+        self.key = key
+        self.bulk = bulk
+        self.bulk_index = bulk_index
+        self.bulk_type = bulk_type
 
         patts = [self._parse_url(u) for u in self.urls]
         self.pool = RoundRobinConnectionPool(patterns=patts)

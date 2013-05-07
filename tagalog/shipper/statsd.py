@@ -7,12 +7,11 @@ from tagalog.shipper.ishipper import IShipper
 log = logging.getLogger(__name__)
 
 class StatsdShipper(IShipper):
-    def __init__(self,args,kwargs):
+    def __init__(self, args, metric, host='127.0.0.1', port='8125'):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.metric = kwargs['metric']
-        host = kwargs.get('host','127.0.0.1')
-        port = int(kwargs.get('port','8125'))
-        self.sock.connect((host, port))
+        self.metric = metric
+        portnum = int(port)
+        self.sock.connect((host, portnum))
 
     def ship(self, msg):
         real_msg = self.__statsd_msg(msg).encode('utf-8')

@@ -4,8 +4,5 @@ class IShipper(object):
     the following methods:
     """
 
-    def __init__(self, args, kwargs):
-        pass
-
     def ship(self, message):
         raise NotImplementedError('IShipper subclasses should implement the "ship" method!')
