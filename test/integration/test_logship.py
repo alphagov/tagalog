@@ -121,7 +121,7 @@ def test_statsd_shipper():
     sock.bind(("127.0.0.1", 8125))
     sock.settimeout(0.2)
 
-    p = Popen('logship -s statsd -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
+    p = Popen('logship -s statsd,metric=%{@source_host}.%{@fields.status} -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
     p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
     data = sock.recv(2048)
