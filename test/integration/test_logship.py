@@ -118,14 +118,15 @@ def test_statsd_shipper():
     }
 
     sock = udp_socket()
+    try:
+        p = Popen('logship -s statsd,metric=%{@source_host}.%{@fields.status} -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
+        p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
-    p = Popen('logship -s statsd,metric=%{@source_host}.%{@fields.status} -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
-    p.communicate(input=json.dumps(input_dict).encode("utf-8"))
+        data = sock.recv(1024)
 
-    data = sock.recv(1024)
-    sock.close()
-
-    assert_equal(data, "fred-flintstone.500:1|c".encode('utf-8'))
+        assert_equal(data, "fred-flintstone.500:1|c".encode('utf-8'))
+    finally:
+        sock.close()
 
 
 ### redis shipper tests ###
@@ -150,7 +151,8 @@ def test_redis_shipper_with_bulk(redis_mock):
         with patch("sys.argv", ['logship', '-s', 'redis,key=redis_key,bulk=true', '-f','init_txt']):
             logship.main()
 
-            redis_mock.return_value.lpush.assert_called_with('redis_key', '{"index": {"_type": "message", "_index": "logs"}}\n{"@message": "rawLogLine"}\n')
+            redis_mock.return_value.lpush.assert_called_with('redis_key',
+                    '{"index": {"_type": "message", "_index": "logs"}}\n{"@message": "rawLogLine"}\n')
 
 ### Using Multiple Shippers ###
 
@@ -158,15 +160,17 @@ def test_stdout_and_statsd_shipper():
     input_dict = { '@source_host': 'road-runner' }
 
     sock = udp_socket()
+    try:
+        p = Popen('logship -s statsd,metric=%{@source_host} stdout -f init_json', shell=True,
+                stdout=PIPE, stdin=PIPE)
 
-    p = Popen('logship -s statsd,metric=%{@source_host} stdout -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
+        result_stdout, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
+        result_statsd = sock.recv(1024)
 
-    result_stdout, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
-    result_statsd = sock.recv(1024)
-    sock.close()
-
-    assert_equal(result_statsd, "road-runner:1|c".encode('utf-8'))
-    assert_equal(json.loads(result_stdout.decode('utf-8')), input_dict)
+        assert_equal(result_statsd, "road-runner:1|c".encode('utf-8'))
+        assert_equal(json.loads(result_stdout.decode('utf-8')), input_dict)
+    finally:
+        sock.close()
 
 ### Setup Functions
 
