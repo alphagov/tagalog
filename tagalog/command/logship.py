@@ -6,7 +6,7 @@ import textwrap
 
 from tagalog import io
 from tagalog import filters
-from tagalog import shipper
+from tagalog.shipper import build_shipper
 
 DEFAULT_FILTERS = 'init_txt,add_timestamp,add_source_host'
 
@@ -18,13 +18,15 @@ parser.add_argument('-f', '--filters', default=DEFAULT_FILTERS,
 parser.add_argument('-a', '--filters-append', action='append',
                     help='A list of filters to apply to each log line '
                          '(appended to the default filter set)')
-parser.add_argument('-s', '--shipper', default='redis',
+parser.add_argument('-s', '--shipper', nargs='+', default='redis',
                     help='Select the shipper to be used to ship logs')
 
 def main():
     args = parser.parse_args()
 
-    shpr = shipper.build_shipper(args.shipper)
+    shippers = []
+    for shipper_desc in args.shipper:
+        shippers.append(build_shipper(shipper_desc))
 
     filterlist = [args.filters]
     if args.filters_append:
@@ -32,7 +34,8 @@ def main():
     pipeline = filters.build(','.join(filterlist))
 
     for msg in pipeline(io.lines(sys.stdin)):
-        shpr.ship(msg)
+        for shpr in shippers:
+            shpr.ship(msg)
 
 if __name__ == '__main__':
     main()
