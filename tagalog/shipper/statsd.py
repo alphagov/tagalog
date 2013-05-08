@@ -13,7 +13,7 @@ class StatsdShipper(IShipper):
         if metric == None:
             raise ShipperError("statsd shipper must be specified with the metric parameter")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.metric = metric.decode('utf-8')
+        self.metric = metric
         portnum = int(port)
         self.sock.connect((host, portnum))
 
