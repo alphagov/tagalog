@@ -2,6 +2,7 @@ import re
 import logging
 import socket
 import operator
+import functools
 
 from tagalog.shipper.ishipper import IShipper
 from tagalog.shipper.shipper_error import ShipperError
