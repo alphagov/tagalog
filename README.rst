@@ -55,7 +55,7 @@ to send logging data to a number of different kinds of destination. At the
 moment, it will connect to one or more Redis servers and will ``LPUSH`` the
 logs onto a Redis list key of your choice.::
 
-    $ ruby myapp.rb | logship -k mylogs -u redis://redis-1.internal:7777 redis://redis-2.internal:7778 redis://redis-3.internal:7779
+    $ ruby myapp.rb | logship -s redis,redis://redis-1.internal:7777,redis://redis-2.internal:7778,redis://redis-3.internal:7779,key=mylogs
 
 Do ``logship -h`` to see available options.
 
