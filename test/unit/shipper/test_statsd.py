@@ -7,10 +7,19 @@ from tagalog.shipper.shipper_error import ShipperError
 
 class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')
-    def test_ship_with_provided_metric(self, socket_mock):
+    def test_ship_with_provided_metric_literal(self, socket_mock):
         kwargs = {'metric': '%{@source_host}.nginx.%{@fields.counter}'}
         ss = StatsdShipper(None, **kwargs)
-        ss.ship({"@fields.counter": 'test', "@source_host":"wilmaaaaa", "@fields.randomness":"ignored"})
+        ss.ship({"@fields.counter": 'test', "@source_host":"wilmaaaaa"})
+
+        socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
+        socket_mock.return_value.send.assert_called_with('wilmaaaaa.nginx.test:1|c'.encode('utf-8'))
+
+    @patch('tagalog.shipper.statsd.socket.socket')
+    def test_ship_with_provided_metric_nested(self, socket_mock):
+        kwargs = {'metric': '%{@source_host}.nginx.%{@fields.counter}'}
+        ss = StatsdShipper(None, **kwargs)
+        ss.ship({"@fields":{"counter": 'test',"randomness":"ignored"}, "@source_host":"wilmaaaaa"})
 
         socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
         socket_mock.return_value.send.assert_called_with('wilmaaaaa.nginx.test:1|c'.encode('utf-8'))

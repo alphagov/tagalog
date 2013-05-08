@@ -1,6 +1,7 @@
 import re
 import logging
 import socket
+import operator
 
 from tagalog.shipper.ishipper import IShipper
 from tagalog.shipper.shipper_error import ShipperError
@@ -12,7 +13,7 @@ class StatsdShipper(IShipper):
         if metric == None:
             raise ShipperError("statsd shipper must be specified with the metric parameter")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.metric = metric
+        self.metric = metric.decode('utf-8')
         portnum = int(port)
         self.sock.connect((host, portnum))
 
@@ -24,7 +25,17 @@ class StatsdShipper(IShipper):
             log.warn("Could not ship message via StatsdShipper: {0}".format(e))
 
     def __statsd_msg(self, msg):
+        def replace_metric_field(match):
+            field = match.group(1)
+            value = None
+            if(field in msg):
+                value = msg[field]
+            else:
+                pieces = field.split('.')
+                # fetch from nested dict
+                value = reduce(operator.getitem, pieces, msg)
+            return str(value)
+
         pattern = r'%{([^}]*)}'
-        replacement = lambda m: str(msg[m.group(1)])
-        realised_metric = re.sub(pattern, replacement, self.metric)
+        realised_metric = re.sub(pattern, replace_metric_field, self.metric)
         return realised_metric + ':1|c'
