@@ -3,6 +3,7 @@ from mock import patch
 import socket
 
 from tagalog.shipper.statsd import StatsdShipper
+from tagalog.shipper.shipper_error import ShipperError
 
 class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')
@@ -39,3 +40,8 @@ class TestStatsdShipper(object):
 
         # should raise
         assert_raises(socket.gaierror, StatsdShipper, None, **kwargs)
+
+    @patch('tagalog.shipper.statsd.socket.socket')
+    def test_ship_when_metric_not_provided(self, socket_mock):
+        # should raise
+        assert_raises(ShipperError, StatsdShipper, None)

@@ -9,10 +9,6 @@ from tagalog.shipper.ishipper import IShipper
 SHIPPERS = {}
 
 
-class ShipperError(Exception):
-    pass
-
-
 class NullShipper(IShipper):
     def __init__(self, args):
         pass
