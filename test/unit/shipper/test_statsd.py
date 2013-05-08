@@ -25,6 +25,15 @@ class TestStatsdShipper(object):
         socket_mock.return_value.send.assert_called_with('wilmaaaaa.nginx.test:1|c'.encode('utf-8'))
 
     @patch('tagalog.shipper.statsd.socket.socket')
+    def test_ship_with_provided_metric_missing(self, socket_mock):
+        kwargs = {'metric': '%{@source_host}.nginx.%{@fields.missing}'}
+        ss = StatsdShipper(None, **kwargs)
+        ss.ship({"@fields":{"counter": 'test',"randomness":"ignored"}, "@source_host":"wilmaaaaa"})
+
+        socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
+        assert not socket_mock.return_value.send.called
+
+    @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_with_provided_host_and_port(self, socket_mock):
         kwargs = {'metric': '%{@source_host}', 'host': 'statsd.cluster', 'port': '27623'}
         ss = StatsdShipper(None, **kwargs)

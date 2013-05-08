@@ -18,11 +18,13 @@ class StatsdShipper(IShipper):
         self.sock.connect((host, portnum))
 
     def ship(self, msg):
-        real_msg = self.__statsd_msg(msg).encode('utf-8')
         try:
+            real_msg = self.__statsd_msg(msg).encode('utf-8')
             self.sock.send(real_msg)
         except socket.error as e:
             log.warn("Could not ship message via StatsdShipper: {0}".format(e))
+        except KeyError as e:
+            log.warn("Could not ship message via StatsdShipper: key {0} not found in message when constructing metric {1}".format(e,self.metric))
 
     def __statsd_msg(self, msg):
         def replace_metric_field(match):
