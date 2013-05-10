@@ -165,20 +165,12 @@ class ResilientStrictRedis(StrictRedis):
 
 class RedisShipper(IShipper):
 
-    def __init__(self, *args, **kwargs):
-        DEFAULTS = {'key':'logs',
-                    'bulk':False,
-                    'bulk_index':'logs',
-                    'bulk_type':'message'}
-        bogus_keys = [key for key in kwargs.keys() if key not in DEFAULTS]
-        if bogus_keys:
-            raise ShipperError('unexpected key passed to RedisShipper: {0}'.format(str(bogus_keys)))
-
-        self.urls = args
-        self.key = kwargs.get('key',DEFAULTS['key'])
-        self.bulk = kwargs.get('bulk',DEFAULTS['bulk'])
-        self.bulk_index = kwargs.get('bulk_index',DEFAULTS['bulk_index'])
-        self.bulk_type = kwargs.get('bulk_type',DEFAULTS['bulk_type'])
+    def __init__(self, urls, key='logs', bulk=False, bulk_index='logs', bulk_type='message'):
+        self.urls = urls
+        self.key = key
+        self.bulk = bulk
+        self.bulk_index = bulk_index
+        self.bulk_type = bulk_type
 
         patts = [self._parse_url(u) for u in self.urls]
         self.pool = RoundRobinConnectionPool(patterns=patts)
