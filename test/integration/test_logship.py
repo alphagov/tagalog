@@ -129,31 +129,6 @@ def test_statsd_shipper():
         sock.close()
 
 
-### redis shipper tests ###
-
-@patch('tagalog.shipper.redis.ResilientStrictRedis')
-def test_redis_shipper(redis_mock):
-    fake_lines = MagicMock()
-    fake_lines.return_value = iter(['rawLogLine\n'])
-
-    with patch("tagalog.io.lines", fake_lines):
-        with patch("sys.argv", ['logship', '-s', 'redis,key=redis_key', '-f','init_txt']):
-            logship.main()
-
-            redis_mock.return_value.lpush.assert_called_with('redis_key', '{"@message": "rawLogLine"}')
-
-@patch('tagalog.shipper.redis.ResilientStrictRedis')
-def test_redis_shipper_with_bulk(redis_mock):
-    fake_lines = MagicMock()
-    fake_lines.return_value = iter(['rawLogLine\n'])
-
-    with patch("tagalog.io.lines", fake_lines):
-        with patch("sys.argv", ['logship', '-s', 'redis,key=redis_key,bulk=true', '-f','init_txt']):
-            logship.main()
-
-            redis_mock.return_value.lpush.assert_called_with('redis_key',
-                    '{"index": {"_type": "message", "_index": "logs"}}\n{"@message": "rawLogLine"}\n')
-
 ### Using Multiple Shippers ###
 
 def test_stdout_and_statsd_shipper():
