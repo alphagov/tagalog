@@ -31,10 +31,19 @@ def unregister_shipper(name):
 def get_shipper(name):
     return SHIPPERS.get(name)
 
+def str2bool(s):
+    mapping = {'true': True,'false': False}
+    return mapping[s]
+
+
 def build_redis(*args, **kwargs):
+    if 'bulk' in kwargs:
+        kwargs['bulk'] = str2bool(kwargs['bulk'])
     return RedisShipper(urls=args,**kwargs)
 
 def build_stdout(*args, **kwargs):
+    if 'bulk' in kwargs:
+        kwargs['bulk'] = str2bool(kwargs['bulk'])
     if args:
         raise ShipperError("unexpected positional arguments to stdout shipper")
     return StdoutShipper(**kwargs)
