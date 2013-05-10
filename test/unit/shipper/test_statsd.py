@@ -9,7 +9,7 @@ class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_with_provided_metric_literal(self, socket_mock):
         kwargs = {'metric': '%{@source_host}.nginx.%{@fields.counter}'}
-        ss = StatsdShipper(None, **kwargs)
+        ss = StatsdShipper(**kwargs)
         ss.ship({"@fields.counter": 'test', "@source_host":"wilmaaaaa"})
 
         socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
@@ -18,7 +18,7 @@ class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_with_provided_metric_nested(self, socket_mock):
         kwargs = {'metric': '%{@source_host}.nginx.%{@fields.counter}'}
-        ss = StatsdShipper(None, **kwargs)
+        ss = StatsdShipper(**kwargs)
         ss.ship({"@fields":{"counter": 'test',"randomness":"ignored"}, "@source_host":"wilmaaaaa"})
 
         socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
@@ -27,7 +27,7 @@ class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_with_provided_metric_missing(self, socket_mock):
         kwargs = {'metric': '%{@source_host}.nginx.%{@fields.missing}'}
-        ss = StatsdShipper(None, **kwargs)
+        ss = StatsdShipper(**kwargs)
         ss.ship({"@fields":{"counter": 'test',"randomness":"ignored"}, "@source_host":"wilmaaaaa"})
 
         socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
@@ -36,7 +36,7 @@ class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_with_provided_host_and_port(self, socket_mock):
         kwargs = {'metric': '%{@source_host}', 'host': 'statsd.cluster', 'port': '27623'}
-        ss = StatsdShipper(None, **kwargs)
+        ss = StatsdShipper(**kwargs)
         ss.ship({"@source_host":"wilmaaaaa"})
 
         socket_mock.return_value.connect.assert_called_with(('statsd.cluster', 27623))
@@ -45,7 +45,7 @@ class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_when_socket_error_occurs(self, socket_mock):
         kwargs = {'metric': '%{@source_host}', 'host': 'statsd.cluster', 'port': '27623'}
-        ss = StatsdShipper(None, **kwargs)
+        ss = StatsdShipper(**kwargs)
         socket_mock.return_value.sendto.side_effect = socket.error('generic socket error')
 
         # should not raise
@@ -57,7 +57,7 @@ class TestStatsdShipper(object):
         socket_mock.return_value.connect.side_effect = socket.gaierror('Thats not a host name!')
 
         # should raise
-        assert_raises(socket.gaierror, StatsdShipper, None, **kwargs)
+        assert_raises(socket.gaierror, StatsdShipper, **kwargs)
 
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_when_metric_not_provided(self, socket_mock):
