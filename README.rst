@@ -41,19 +41,22 @@ Next up is ``logtag``, which transforms each log line into a
 Logstash_-compatible JSON document. In addition to adding a ``@timestamp``
 field, you can also add a list of tags to each document::
 
-    $ seq 3 | logtag -t "$(hostname -f)" sequence
-    {"@timestamp": "2013-02-09T19:02:05.200903Z", "@message": "1", "@tags": ["ravel.local", "sequence"]}
-    {"@timestamp": "2013-02-09T19:02:05.201349Z", "@message": "2", "@tags": ["ravel.local", "sequence"]}
-    {"@timestamp": "2013-02-09T19:02:05.201398Z", "@message": "3", "@tags": ["ravel.local", "sequence"]}
+    $ seq 3 | logtag -a add_tags:sequence:foobar
+    {"@timestamp": "2013-05-10T10:38:22.103940Z", "@source_host": "lynx.local",
+    "@message": "1", "@tags": ["sequence", "foobar"]}
+    {"@timestamp": "2013-05-10T10:38:22.106518Z", "@source_host": "lynx.local",
+    "@message": "2", "@tags": ["sequence", "foobar"]}
+    {"@timestamp": "2013-05-10T10:38:22.106811Z", "@source_host": "lynx.local",
+    "@message": "3", "@tags": ["sequence", "foobar"]}
 
 .. _Logstash: http://logstash.net/
 
-Probably the most useful tool in the box, however, is ``logship``, which does
-everything ``logtag`` does, but instead of simply printing the log data to
-STDOUT, it ships it somewhere else. In the future, I expect logship to be able
-to send logging data to a number of different kinds of destination. At the
-moment, it will connect to one or more Redis servers and will ``LPUSH`` the
-logs onto a Redis list key of your choice.::
+As you can see, Tagalog adds a ``@timestamp`` and ``@source_host`` field to each
+document by default.
+
+Probably the most useful tool in the box is ``logship``, which does everything
+``logtag`` does, but instead of simply printing the log data to STDOUT, it ships
+it somewhere else.::
 
     $ ruby myapp.rb | logship -s redis,redis://redis-1.internal:7777,redis://redis-2.internal:7778,redis://redis-3.internal:7779,key=mylogs
 
@@ -72,7 +75,7 @@ herd`_.
 Lastly, there is ``logtext``, which does roughly the reverse of ``logtag``. It
 reads JSON documents on STDIN and translates them back into plain text::
 
-    $ seq 3 | logtag -t "$(hostname -f)" sequence --no-stamp | logtext
+    $ seq 3 | logtag -f init_txt |  logtext
     1
     2
     3
