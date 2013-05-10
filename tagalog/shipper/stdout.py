@@ -4,8 +4,7 @@ from tagalog.shipper.formatter import format_as_json, format_as_elasticsearch_bu
 from tagalog.shipper.ishipper import IShipper
 
 class StdoutShipper(IShipper):
-    def __init__(self, args, bulk=False, bulk_index='logs', bulk_type='message'):
-        self.args = args
+    def __init__(self, bulk=False, bulk_index='logs', bulk_type='message'):
         self.bulk = bulk
         self.bulk_index = bulk_index
         self.bulk_type = bulk_type

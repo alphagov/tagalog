@@ -4,6 +4,7 @@ from mock import patch, MagicMock
 
 from ...helpers import assert_raises, assert_equal, assert_not_equal
 from tagalog.shipper.redis import RoundRobinConnectionPool,RedisShipper
+from tagalog.shipper.shipper_error import ShipperError
 
 
 class MockConnection(object):
@@ -151,20 +152,20 @@ class TestRedisShipper(object):
 
     @patch('tagalog.shipper.redis.ResilientStrictRedis')
     def test_ship_writes_json_messages(self, redis_mock):
-        rs = RedisShipper(self.args, key='redis_key')
+        rs = RedisShipper(*self.args, key='redis_key')
         rs.ship({'@message':'logLine'})
         redis_mock.return_value.lpush.assert_called_with('redis_key','{"@message": "logLine"}')
 
     @patch('tagalog.shipper.redis.ResilientStrictRedis')
     def test_ship_writes_elasticsearch_bulk_messages(self, redis_mock):
-        rs = RedisShipper(self.args, key='redis_key', bulk=True)
+        rs = RedisShipper(*self.args, key='redis_key', bulk=True)
         rs.ship({'@message':'logLine'})
         redis_mock.return_value.lpush.assert_called_with('redis_key',
             '{"index": {"_type": "message", "_index": "logs"}}\n{"@message": "logLine"}\n')
 
     @patch('tagalog.shipper.redis.ResilientStrictRedis')
     def test_ship_catches_connection_errors(self, redis_mock):
-        rs = RedisShipper(self.args)
+        rs = RedisShipper(*self.args)
         redis_mock.return_value.lpush.side_effect = redis.ConnectionError("Boom!")
 
         # should not raise:
@@ -172,8 +173,12 @@ class TestRedisShipper(object):
 
     @patch('tagalog.shipper.redis.ResilientStrictRedis')
     def test_ship_catches_response_errors(self, redis_mock):
-        rs = RedisShipper(self.args)
+        rs = RedisShipper(*self.args)
         redis_mock.return_value.lpush.side_effect = redis.ResponseError("Boom!")
 
         # should not raise:
         rs.ship({'@message':'foo'})
+
+    @patch('tagalog.shipper.redis.ResilientStrictRedis')
+    def test_ship_rejects_bogus_keys(self, redis_mock):
+        assert_raises(ShipperError, lambda : RedisShipper(*self.args, foo='bar'))
