@@ -97,8 +97,13 @@ def get(name, args=[]):
 
 def init_txt(iterable):
     """
-    Read lines of text from the iterable ``iterable`` and yield dicts with the
-    line data stored in the key given by ``key`` (default: "@message").
+    Read lines of text from ``iterable`` and yield dicts with the line data
+    stored in the ``@message`` field.
+
+    >>> data_in = ["hello\\n", "world\\n"]
+    >>> data_out = init_txt(data_in)
+    >>> [x for x in data_out]
+    [{'@message': 'hello'}, {'@message': 'world'}]
     """
     for line in iterable:
         txt = line.rstrip('\n')
@@ -108,9 +113,14 @@ FILTERS['init_txt'] = init_txt
 
 def init_json(iterable):
     """
-    Read lines of JSON input from the iterable ``iterable`` and yield dicts.
-    Each event must be on a single line. Unparseable events will be skipped and
-    raise a warning.
+    Read lines of JSON text from ``iterable`` and parse each line as a JSON
+    object. Yield dicts for each line that successfully parses as a JSON object.
+    Unparseable events will be skipped and raise a warning.
+
+    >>> data_in = ['{"@message": "one message"}', '{"@message": "another message"}']
+    >>> data_out = init_json(data_in)
+    >>> [x for x in data_out]
+    [{u'@message': u'one message'}, {u'@message': u'another message'}]
     """
     for line in iterable:
         try:
@@ -128,20 +138,20 @@ def init_json(iterable):
 FILTERS['init_json'] = init_json
 
 
-def now():
-    return _now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-
-
-def _now():
-    return datetime.datetime.utcnow()
-
-
 def add_timestamp(iterable, override=False):
     """
-    Compute an accurate timestamp for item in ``iterable``, adding an accurate
-    timestamp to each one when received. The timestamp is a usecond-precision
-    ISO8601 string. The timestamp is added to each dict with a key set by
-    ``key`` unless the dict already contains its own.
+    Compute an accurate timestamp for each item in ``iterable``, adding an
+    accurate timestamp to each one when received. The timestamp is a
+    usecond-precision ISO8601 string added to the ``@timestamp`` field.
+
+    By default, existing ``@timestamp`` fields will not be overwritten. This
+    behaviour can be toggled with the ``override`` argument.
+
+    >>> data_in = [{'@message': 'one message'}, {'@message': 'another message'}]
+    >>> data_out = add_timestamp(data_in)
+    >>> [x for x in data_out]
+    [{'@timestamp': '2013-05-13T10:37:56.766743Z', '@message': 'one message'},
+     {'@timestamp': '2013-05-13T10:37:56.767185Z', '@message': 'another message'}]
     """
     k = '@timestamp'
     for item in iterable:
@@ -153,7 +163,17 @@ FILTERS['add_timestamp'] = add_timestamp
 
 def add_source_host(iterable, override=False):
     """
-    Add the source host for each dict or dict-like object in ``iterable``.
+    Add the FQDN of the current machine to the ``@source_host`` field of each
+    item in ``iterable``.
+
+    By default, existing ``@source_host`` fields will not be overwritten. This
+    behaviour can be toggled with the ``override`` argument.
+
+    >>> data_in = [{'@message': 'one message'}, {'@message': 'another message'}]
+    >>> data_out = add_source_host(data_in)
+    >>> [x for x in data_out]
+    [{'@source_host': 'lynx.local', '@message': 'one message'},
+     {'@source_host': 'lynx.local', '@message': 'another message'}]
     """
     k = '@source_host'
     source_host = socket.getfqdn()
@@ -167,7 +187,13 @@ FILTERS['add_source_host'] = add_source_host
 def add_fields(iterable, **kw_fields):
     """
     Add fields to each item in ``iterable``. Each key=value pair provided is
-    merged into the '@fields' object, which will be created if required.
+    merged into the ``@fields`` object, which will be created if required.
+
+    >>> data_in = [{'@message': 'one message'}, {'@message': 'another message'}]
+    >>> data_out = add_fields(data_in, foo='bar', baz='qux')
+    >>> [x for x in data_out]
+    [{'@fields': {'foo': 'bar', 'baz': 'qux'}, '@message': 'one message'},
+     {'@fields': {'foo': 'bar', 'baz': 'qux'}, '@message': 'another message'}]
     """
     k = '@fields'
     for item in iterable:
@@ -180,8 +206,14 @@ FILTERS['add_fields'] = add_fields
 
 def add_tags(iterable, *taglist):
     """
-    Add tags to each item in ``iterable``. Each tag is added to the '@tags'
+    Add tags to each item in ``iterable``. Each tag is added to the ``@tags``
     array, which will be created if required.
+
+    >>> data_in = [{'@message': 'one message'}, {'@message': 'another message'}]
+    >>> data_out = add_tags(data_in, 'foo', 'bar')
+    >>> [x for x in data_out]
+    [{'@message': 'one message', '@tags': ['foo', 'bar']},
+     {'@message': 'another message', '@tags': ['foo', 'bar']}]
     """
     k = '@tags'
     for item in iterable:
@@ -199,6 +231,13 @@ def parse_lograge(iterable):
     Attempt to parse each dict or dict-like object in ``iterable`` as if it were
     in lograge format, (e.g. "status=200 path=/users/login time=125ms"), adding
     key-value pairs to '@fields' for each matching item.
+
+    >>> data_in = [{'@message': 'path=/foo/bar status=200 time=0.060'},
+    ...            {'@message': 'path=/baz/qux status=503 time=1.651'}]
+    >>> data_out = parse_lograge(data_in)
+    >>> [x for x in data_out]
+    [{'@fields': {'status': '200', 'path': '/foo/bar', 'time': '0.060'}, '@message': 'path=/foo/bar status=200 time=0.060'},
+     {'@fields': {'status': '503', 'path': '/baz/qux', 'time': '1.651'}, '@message': 'path=/baz/qux status=503 time=1.651'}]
     """
     for item in iterable:
         if '@message' not in item:
