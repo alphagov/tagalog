@@ -251,3 +251,13 @@ def parse_lograge(iterable):
                 item['@fields'][ret[0]] = ret[1]
         yield item
 FILTERS['parse_lograge'] = parse_lograge
+
+
+def now():
+    return _now().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+
+
+def _now():
+    return datetime.datetime.utcnow()
+
+
