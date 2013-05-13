@@ -14,7 +14,7 @@ your repository checkout, assuming you have installed and configured virtualenv
 and virtualenvwrapper::
 
     $ mkvirtualenv tagalog
-    $ pip install -e .
+    $ pip install -r requirements.dev.txt
 
 If this sequence of commands completes successfully you will end up with the
 Tagalog tools in your ``$PATH``::
@@ -28,7 +28,7 @@ add or update the list of commands in ``setup.py`` you will need to rerun
 
 ::
 
-    $ pip install -e .
+    $ pip install -r requirements.dev.txt
 
 .. _pip: http://www.pip-installer.org/
 .. _virtualenv: http://www.virtualenv.org/

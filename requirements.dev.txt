@@ -1,0 +1,5 @@
+# Install development dependencies
+-e .
+nose
+mock
+sphinx
