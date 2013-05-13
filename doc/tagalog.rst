@@ -6,7 +6,6 @@ tagalog Package
 
 .. automodule:: tagalog.filters
     :members:
-    :undoc-members:
     :show-inheritance:
 
 :mod:`io` Module

@@ -1,3 +1,13 @@
+"""
+The :mod:`filters` Module contains the definitions for the filters supported by
+``logtag`` and ``logship``, as well as a number of functions used to construct
+the filter chains.
+
+A filter is a generator function which takes an iterable as its first argument,
+and optionally takes additional configuration arguments. It returns a generator
+yielding the filtered log lines.
+"""
+
 import csv
 import datetime
 import itertools
@@ -13,8 +23,35 @@ class FilterError(Exception):
     pass
 
 
-def pipeline(head, *tail):
-    """Construct a filter pipeline from a list of functions"""
+def pipeline(*functions):
+    """
+    Construct a filter pipeline from a list of filter functions
+
+    Given a list of functions taking an iterable as their only argument, and
+    which return a generator, this function will return a single function with the
+    same signature, which applies each function in turn for each item in the
+    iterable, yielding the results.
+
+    That is, given filter functions ``a``, ``b``, and ``c``, ``pipeline(a, b,
+    c)`` will return a function which yields ``c(b(a(x)))`` for each item ``x``
+    in the iterable passed to it. For example:
+
+    >>> def a(iterable):
+    ...     for item in iterable:
+    ...         yield item + ':a'
+    ...
+    >>> def b(iterable):
+    ...     for item in iterable:
+    ...         yield item + ':b'
+    ...
+    >>> pipe = pipeline(a, b)
+    >>> data_in = ["foo", "bar"]
+    >>> data_out = pipe(data_in)
+    >>> [x for x in data_out]
+    ['foo:a:b', 'bar:a:b']
+    """
+    head = functions[0]
+    tail = functions[1:]
     if tail:
         def _fn(iterable):
             for i in pipeline(*tail)(head(iterable)):
