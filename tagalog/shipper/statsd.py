@@ -10,9 +10,7 @@ from tagalog.shipper.shipper_error import ShipperError
 log = logging.getLogger(__name__)
 
 class StatsdShipper(IShipper):
-    def __init__(self, metric=None, host='127.0.0.1', port='8125'):
-        if metric == None:
-            raise ShipperError("statsd shipper must be specified with the metric parameter")
+    def __init__(self, metric, host='127.0.0.1', port='8125'):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.metric = metric
         portnum = int(port)

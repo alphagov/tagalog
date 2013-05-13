@@ -31,10 +31,36 @@ def unregister_shipper(name):
 def get_shipper(name):
     return SHIPPERS.get(name)
 
-register_shipper('redis', RedisShipper)
-register_shipper('stdout', StdoutShipper)
-register_shipper('statsd', StatsdShipper)
-register_shipper('null', NullShipper)
+def str2bool(s):
+    mapping = {'true': True,'false': False}
+    return mapping[s]
+
+
+def build_redis(*args, **kwargs):
+    if 'bulk' in kwargs:
+        kwargs['bulk'] = str2bool(kwargs['bulk'])
+    return RedisShipper(urls=args,**kwargs)
+
+def build_stdout(*args, **kwargs):
+    if 'bulk' in kwargs:
+        kwargs['bulk'] = str2bool(kwargs['bulk'])
+    if args:
+        raise ShipperError("unexpected positional arguments to stdout shipper")
+    return StdoutShipper(**kwargs)
+
+def build_statsd(*args, **kwargs):
+    if args:
+        raise ShipperError("unexpected positional arguments to statsd shipper")
+    return StatsdShipper(**kwargs)
+
+def build_null(*args, **kwargs):
+    return NullShipper()
+
+
+register_shipper('redis', build_redis)
+register_shipper('stdout', build_stdout)
+register_shipper('statsd', build_statsd)
+register_shipper('null', build_null)
 
 
 def parse_shipper(description):

@@ -58,8 +58,3 @@ class TestStatsdShipper(object):
 
         # should raise
         assert_raises(socket.gaierror, StatsdShipper, **kwargs)
-
-    @patch('tagalog.shipper.statsd.socket.socket')
-    def test_ship_when_metric_not_provided(self, socket_mock):
-        # should raise
-        assert_raises(ShipperError, StatsdShipper, None)
