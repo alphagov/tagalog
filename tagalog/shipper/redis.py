@@ -157,7 +157,14 @@ class ResilientStrictRedis(StrictRedis):
                 res = self.parse_response(connection, command_name, **options)
                 pool.release(connection)
                 return res
-            except ConnectionError:
+
+            # If anything goes wrong in .send_command() or .parse_response(),
+            # and we don't catch it, this connection will never be returned to
+            # the pool, and thus will leak.
+            #
+            # So, catch *everything* here except SystemExits and
+            # KeyboardInterrupts.
+            except Exception:
                 pool.purge(connection)
                 if i >= self.execution_attempts - 1:
                     raise
@@ -184,7 +191,7 @@ class RedisShipper(IShipper):
             payload = format_as_json(msg)
         try:
             self.rc.lpush(self.key, payload)
-        except RedisError as e:
+        except Exception as e:
             log.warn('Could not ship message: {0}'.format(e))
 
     def _parse_url(self, url):
