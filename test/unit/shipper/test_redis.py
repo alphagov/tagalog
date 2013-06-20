@@ -160,8 +160,12 @@ class TestRedisShipper(object):
     def test_ship_writes_elasticsearch_bulk_messages(self, redis_mock):
         rs = RedisShipper(urls=self.urls, key='redis_key', bulk=True)
         rs.ship({'@message':'logLine'})
-        redis_mock.return_value.lpush.assert_called_with('redis_key',
-            '{"index": {"_type": "message", "_index": "logs"}}\n{"@message": "logLine"}\n')
+        redis_mock.return_value.lpush.assert_called_once()
+        call_args, _ = redis_mock.return_value.lpush.call_args
+        assert_equal('redis_key', call_args[0])
+        # Bulk format contains 2 lines per entry. Don't test the exact format as
+        # that's covered already by test_formatter.
+        assert_equal(2, len(call_args[1].splitlines()))
 
     @patch('tagalog.shipper.redis.ResilientStrictRedis')
     def test_ship_catches_connection_errors(self, redis_mock):

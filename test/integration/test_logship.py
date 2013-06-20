@@ -21,8 +21,11 @@ def test_elasticsearch_bulk_format():
               shell=True, stdout=PIPE, stdin=PIPE)
     data_out, _ = p.communicate(input='hello'.encode("utf-8"))
 
-    assert_equal('{"index": {"_type": "message", "_index": "logs-current"}}\n{"@message": "hello"}\n\n',
-                 data_out.decode("utf-8"))
+    lines = data_out.decode("utf-8").splitlines()
+    assert_equal({'index': {'_type': 'message', '_index': 'logs-current'}},
+                 json.loads(lines[0]))
+    assert_equal({'@message': 'hello'}, json.loads(lines[1]))
+
 
 def test_add_tags():
     p = Popen('logship -s stdout -f init_txt,add_tags:handbags:great',
@@ -109,7 +112,6 @@ def test_json_source_host():
     input_dict['@source_host'] = getfqdn()
     assert_equal(input_dict, json.loads(data_out.decode("utf-8")))
 
-### statsd shipper tests ###
 
 def test_statsd_shipper():
     input_dict = {
@@ -117,7 +119,7 @@ def test_statsd_shipper():
       '@fields.status': 500,
     }
 
-    sock = udp_socket()
+    sock = _udp_socket()
     try:
         p = Popen('logship -s statsd,metric=%{@source_host}.%{@fields.status} -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
         p.communicate(input=json.dumps(input_dict).encode("utf-8"))
@@ -129,12 +131,10 @@ def test_statsd_shipper():
         sock.close()
 
 
-### Using Multiple Shippers ###
-
 def test_stdout_and_statsd_shipper():
     input_dict = { '@source_host': 'road-runner' }
 
-    sock = udp_socket()
+    sock = _udp_socket()
     try:
         p = Popen('logship -s statsd,metric=%{@source_host} stdout -f init_json', shell=True,
                 stdout=PIPE, stdin=PIPE)
@@ -147,9 +147,8 @@ def test_stdout_and_statsd_shipper():
     finally:
         sock.close()
 
-### Setup Functions
 
-def udp_socket():
+def _udp_socket():
     sock = socket(AF_INET, SOCK_DGRAM)
     sock.bind(("127.0.0.1", 8125))
     sock.settimeout(0.2)
