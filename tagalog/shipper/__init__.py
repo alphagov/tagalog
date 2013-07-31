@@ -3,6 +3,7 @@ import csv
 from tagalog.shipper.redis import RedisShipper
 from tagalog.shipper.stdout import StdoutShipper
 from tagalog.shipper.statsd import StatsdShipper
+from tagalog.shipper.statsd_timer import StatsdTimerShipper
 from tagalog.shipper.ishipper import IShipper
 
 
@@ -57,6 +58,12 @@ def build_statsd(*args, **kwargs):
     return StatsdShipper(**kwargs)
 
 
+def build_statsd_timer(*args, **kwargs):
+    if args:
+        raise ShipperError("unexpected positional arguments to statsd_timer shipper")
+    return StatsdTimerShipper(**kwargs)
+
+
 def build_null(*args, **kwargs):
     return NullShipper()
 
@@ -64,6 +71,7 @@ def build_null(*args, **kwargs):
 register_shipper('redis', build_redis)
 register_shipper('stdout', build_stdout)
 register_shipper('statsd', build_statsd)
+register_shipper('statsd_timer', build_statsd_timer)
 register_shipper('null', build_null)
 
 

@@ -1,0 +1,19 @@
+from ...helpers import assert_raises, assert_regexp_matches
+from mock import patch, ANY
+import socket
+
+from tagalog.shipper.statsd_timer import StatsdTimerShipper
+from tagalog.shipper.shipper_error import ShipperError
+
+class TestStatsdShipper(object):
+    @patch('tagalog.shipper.statsd.socket.socket')
+    def test_ship_with_provided_metric_literal(self, socket_mock):
+        kwargs = {'metric': '%{@source_host}.nginx.foo', 'timed_field': 'request_time'}
+        ss = StatsdTimerShipper(**kwargs)
+        ss.ship({"@source_host": 'wilmaaaaa', 'request_time': 32.25})
+
+        socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
+        socket_mock.return_value.send.assert_called_with(ANY)
+        args, kwargs = socket_mock.return_value.send.call_args
+        packet = args[0]
+        assert_regexp_matches(packet, r'^wilmaaaaa:32.250*|ms$')

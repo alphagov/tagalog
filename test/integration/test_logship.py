@@ -3,7 +3,7 @@ from subprocess import Popen, PIPE
 from mock import patch, MagicMock
 import json
 
-from ..helpers import assert_equal, assert_true, TimestampRange
+from ..helpers import assert_equal, assert_true, assert_regexp_matches, TimestampRange
 from tagalog.command import logship
 
 
@@ -127,6 +127,25 @@ def test_statsd_shipper():
         data = sock.recv(1024)
 
         assert_equal(data, "fred-flintstone.500:1|c".encode('utf-8'))
+    finally:
+        sock.close()
+
+
+def test_statsd_timer_shipper():
+    input_dict = {
+      '@source_host': 'fred-flintstone',
+      '@fields.status': 500,
+      '@fields.request_time': 40.25,
+    }
+
+    sock = _udp_socket()
+    try:
+        p = Popen('logship -s statsd_timer,metric=%{@source_host}.request_time,timed_field=@fields.request_time -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
+        p.communicate(input=json.dumps(input_dict).encode("utf-8"))
+
+        data = sock.recv(1024)
+
+        assert_regexp_matches(data, r"^fred-flintstone.request_time:40.250*|ms$".encode('utf-8'))
     finally:
         sock.close()
 
