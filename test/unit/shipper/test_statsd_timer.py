@@ -16,4 +16,4 @@ class TestStatsdShipper(object):
         socket_mock.return_value.send.assert_called_with(ANY)
         args, kwargs = socket_mock.return_value.send.call_args
         packet = args[0]
-        assert_regexp_matches(packet.encode('utf-8'), r'^wilmaaaaa:32.250*|ms$')
+        assert_regexp_matches(packet.decode('utf-8'), r'^wilmaaaaa:32.250*|ms$')
