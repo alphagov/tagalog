@@ -2,6 +2,7 @@ from socket import socket, AF_INET, SOCK_DGRAM, getfqdn
 from subprocess import Popen, PIPE
 from mock import patch, MagicMock
 import json
+import re
 
 from ..helpers import assert_equal, assert_true, TimestampRange
 from tagalog.command import logship
@@ -121,7 +122,7 @@ def test_statsd_shipper():
 
     sock = _udp_socket()
     try:
-        p = Popen('logship -s statsd,metric=%{@source_host}.%{@fields.status} -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
+        p = Popen('logship -s statsd_counter,metric=%{@source_host}.%{@fields.status} -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
         p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
         data = sock.recv(1024)
@@ -131,12 +132,31 @@ def test_statsd_shipper():
         sock.close()
 
 
+def test_statsd_timer_shipper():
+    input_dict = {
+      '@source_host': 'fred-flintstone',
+      '@fields.status': 500,
+      '@fields.request_time': 40.25,
+    }
+
+    sock = _udp_socket()
+    try:
+        p = Popen('logship -s statsd_timer,metric=%{@source_host}.request_time,timed_field=@fields.request_time -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
+        p.communicate(input=json.dumps(input_dict).encode("utf-8"))
+
+        data = sock.recv(1024)
+
+        assert_true(re.search(r"^fred-flintstone.request_time:40.250*\|ms$", data.decode('utf-8')))
+    finally:
+        sock.close()
+
+
 def test_stdout_and_statsd_shipper():
     input_dict = { '@source_host': 'road-runner' }
 
     sock = _udp_socket()
     try:
-        p = Popen('logship -s statsd,metric=%{@source_host} stdout -f init_json', shell=True,
+        p = Popen('logship -s statsd_counter,metric=%{@source_host} stdout -f init_json', shell=True,
                 stdout=PIPE, stdin=PIPE)
 
         result_stdout, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
