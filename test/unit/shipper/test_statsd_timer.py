@@ -1,5 +1,6 @@
-from ...helpers import assert_raises, assert_regexp_matches
+from ...helpers import assert_raises, assert_true
 from mock import patch, ANY
+import re
 import socket
 
 from tagalog.shipper.statsd_timer import StatsdTimerShipper
@@ -16,4 +17,4 @@ class TestStatsdShipper(object):
         socket_mock.return_value.send.assert_called_with(ANY)
         args, kwargs = socket_mock.return_value.send.call_args
         packet = args[0]
-        assert_regexp_matches(packet.decode('utf-8'), r'^wilmaaaaa.nginx.foo:32.250*\|ms$')
+        assert_true(re.search(r'^wilmaaaaa\.nginx\.foo:32\.250*\|ms$', packet.decode('utf-8')))

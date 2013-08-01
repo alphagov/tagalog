@@ -2,8 +2,9 @@ from socket import socket, AF_INET, SOCK_DGRAM, getfqdn
 from subprocess import Popen, PIPE
 from mock import patch, MagicMock
 import json
+import re
 
-from ..helpers import assert_equal, assert_true, assert_regexp_matches, TimestampRange
+from ..helpers import assert_equal, assert_true, TimestampRange
 from tagalog.command import logship
 
 
@@ -145,7 +146,7 @@ def test_statsd_timer_shipper():
 
         data = sock.recv(1024)
 
-        assert_regexp_matches(data, r"^fred-flintstone.request_time:40.250*\|ms$".encode('utf-8'))
+        assert_true(re.search(r"^fred-flintstone.request_time:40.250*\|ms$", data.decode('utf-8')))
     finally:
         sock.close()
 
