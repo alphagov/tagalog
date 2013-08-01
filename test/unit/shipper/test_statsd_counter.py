@@ -1,9 +1,7 @@
-from ...helpers import assert_raises
 from mock import patch
 import socket
 
 from tagalog.shipper.statsd_counter import StatsdCounterShipper
-from tagalog.shipper.shipper_error import ShipperError
 
 
 class TestStatsdCounterShipper(object):

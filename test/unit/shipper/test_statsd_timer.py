@@ -1,10 +1,10 @@
-from ...helpers import assert_raises, assert_true
+from ...helpers import assert_true
 from mock import patch, ANY
 import re
 import socket
 
 from tagalog.shipper.statsd_timer import StatsdTimerShipper
-from tagalog.shipper.shipper_error import ShipperError
+
 
 class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')

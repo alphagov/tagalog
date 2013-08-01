@@ -9,6 +9,7 @@ from tagalog.shipper.shipper_error import ShipperError
 
 log = logging.getLogger(__name__)
 
+
 def get_from_msg(field, msg):
     if(field in msg):
         return msg[field]
@@ -16,6 +17,7 @@ def get_from_msg(field, msg):
         pieces = field.split('.')
         # fetch from nested dict
         return reduce(operator.getitem, pieces, msg)
+
 
 class StatsdShipper(IShipper):
     def __init__(self, metric, host='127.0.0.1', port='8125'):
