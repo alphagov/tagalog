@@ -3,37 +3,36 @@ from mock import patch
 import socket
 
 from tagalog.shipper.statsd import StatsdShipper
-from tagalog.shipper.statsd_counter import StatsdCounterShipper
 from tagalog.shipper.shipper_error import ShipperError
 
 
 class DumbStatsdShipper(StatsdShipper):
     def _statsd_msg(self, msg):
-        return "boring-message"
+        return "dumb|msg"
 
 class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_with_provided_metric_literal(self, socket_mock):
         kwargs = {'metric': '%{@source_host}.nginx.%{@fields.counter}'}
-        ss = StatsdCounterShipper(**kwargs)
+        ss = DumbStatsdShipper(**kwargs)
         ss.ship({"@fields.counter": 'test', "@source_host":"wilmaaaaa"})
 
         socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
-        socket_mock.return_value.send.assert_called_with('wilmaaaaa.nginx.test:1|c'.encode('utf-8'))
+        socket_mock.return_value.send.assert_called_with('wilmaaaaa.nginx.test:dumb|msg'.encode('utf-8'))
 
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_with_provided_metric_nested(self, socket_mock):
         kwargs = {'metric': '%{@source_host}.nginx.%{@fields.counter}'}
-        ss = StatsdCounterShipper(**kwargs)
+        ss = DumbStatsdShipper(**kwargs)
         ss.ship({"@fields":{"counter": 'test',"randomness":"ignored"}, "@source_host":"wilmaaaaa"})
 
         socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
-        socket_mock.return_value.send.assert_called_with('wilmaaaaa.nginx.test:1|c'.encode('utf-8'))
+        socket_mock.return_value.send.assert_called_with('wilmaaaaa.nginx.test:dumb|msg'.encode('utf-8'))
 
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_with_provided_metric_missing(self, socket_mock):
         kwargs = {'metric': '%{@source_host}.nginx.%{@fields.missing}'}
-        ss = StatsdCounterShipper(**kwargs)
+        ss = DumbStatsdShipper(**kwargs)
         ss.ship({"@fields":{"counter": 'test',"randomness":"ignored"}, "@source_host":"wilmaaaaa"})
 
         socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
@@ -46,7 +45,7 @@ class TestStatsdShipper(object):
         ss.ship({"@source_host":"wilmaaaaa"})
 
         socket_mock.return_value.connect.assert_called_with(('statsd.cluster', 27623))
-        socket_mock.return_value.send.assert_called_with('boring-message'.encode('utf-8'))
+        socket_mock.return_value.send.assert_called_with('wilmaaaaa:dumb|msg'.encode('utf-8'))
 
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_when_socket_error_occurs(self, socket_mock):
