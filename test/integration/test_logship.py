@@ -145,7 +145,7 @@ def test_statsd_timer_shipper():
 
         data = sock.recv(1024)
 
-        assert_regexp_matches(data, r"^fred-flintstone.request_time:40.250*|ms$".encode('utf-8'))
+        assert_regexp_matches(data, r"^fred-flintstone.request_time:40.250*\|ms$".encode('utf-8'))
     finally:
         sock.close()
 
