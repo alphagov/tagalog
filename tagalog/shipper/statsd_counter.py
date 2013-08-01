@@ -1,7 +1,3 @@
-import re
-import logging
-import socket
-import operator
 from tagalog.shipper.statsd import StatsdShipper
 
 
