@@ -18,25 +18,9 @@ class StatsdShipper(IShipper):
 
     def ship(self, msg):
         try:
-            real_msg = self.__statsd_msg(msg).encode('utf-8')
+            real_msg = self._statsd_msg(msg).encode('utf-8')
             self.sock.send(real_msg)
         except socket.error as e:
             log.warn("Could not ship message via StatsdShipper: {0}".format(e))
         except KeyError as e:
             log.warn("Could not ship message via StatsdShipper: key {0} not found in message when constructing metric {1}".format(e,self.metric))
-
-    def __statsd_msg(self, msg):
-        def replace_metric_field(match):
-            field = match.group(1)
-            value = None
-            if(field in msg):
-                value = msg[field]
-            else:
-                pieces = field.split('.')
-                # fetch from nested dict
-                value = reduce(operator.getitem, pieces, msg)
-            return str(value)
-
-        pattern = r'%{([^}]*)}'
-        realised_metric = re.sub(pattern, replace_metric_field, self.metric)
-        return realised_metric + ':1|c'

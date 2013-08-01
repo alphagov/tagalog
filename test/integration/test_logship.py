@@ -122,7 +122,7 @@ def test_statsd_shipper():
 
     sock = _udp_socket()
     try:
-        p = Popen('logship -s statsd,metric=%{@source_host}.%{@fields.status} -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
+        p = Popen('logship -s statsd_counter,metric=%{@source_host}.%{@fields.status} -f init_json', shell=True, stdout=PIPE, stdin=PIPE)
         p.communicate(input=json.dumps(input_dict).encode("utf-8"))
 
         data = sock.recv(1024)
@@ -156,7 +156,7 @@ def test_stdout_and_statsd_shipper():
 
     sock = _udp_socket()
     try:
-        p = Popen('logship -s statsd,metric=%{@source_host} stdout -f init_json', shell=True,
+        p = Popen('logship -s statsd_counter,metric=%{@source_host} stdout -f init_json', shell=True,
                 stdout=PIPE, stdin=PIPE)
 
         result_stdout, _ = p.communicate(input=json.dumps(input_dict).encode("utf-8"))
