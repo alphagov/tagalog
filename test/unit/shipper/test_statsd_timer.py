@@ -9,8 +9,7 @@ from tagalog.shipper.statsd_timer import StatsdTimerShipper
 class TestStatsdShipper(object):
     @patch('tagalog.shipper.statsd.socket.socket')
     def test_ship_with_provided_metric_literal(self, socket_mock):
-        kwargs = {'metric': '%{@source_host}.nginx.foo', 'timed_field': 'request_time'}
-        ss = StatsdTimerShipper(**kwargs)
+        ss = StatsdTimerShipper(metric='%{@source_host}.nginx.foo', timed_field='request_time')
         ss.ship({"@source_host": 'wilmaaaaa', 'request_time': 32.25})
 
         socket_mock.return_value.connect.assert_called_with(('127.0.0.1', 8125))
