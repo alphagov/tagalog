@@ -6,6 +6,16 @@ A set of commandline tools for manipulating logfiles on the fly.
 .. image:: https://travis-ci.org/alphagov/tagalog.png?branch=master
    :target: https://travis-ci.org/alphagov/tagalog
 
+No longer a recommended solution
+--------------------------------
+
+We would recommend that you used Lumberjack_ or Heka_. These both deal 
+with I/O in a better manner (non-blocking) and have a larger community around
+them.
+
+.. _Lumberjack: https://github.com/jordansissel/lumberjack
+.. _Heka: https://github.com/mozilla-services/heka
+
 Installation
 ------------
 
